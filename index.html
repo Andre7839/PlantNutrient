@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soil Chemistry & Plant Nutrition — Advanced Irrigation Lab</title>
+<style>
+  :root{
+    --bg:#f6f4ee; --panel:#ffffff; --ink:#2b2a25; --muted:#6b6a5f;
+    --accent:#3d6b46; --accent2:#8a5a2b; --line:#e2ddd0; --warn:#b3462c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink);
+  }
+  header{
+    background:linear-gradient(120deg,#2f4d33,#3d6b46 60%,#5c8a56);
+    color:#f4f1e6; padding:22px 28px;
+  }
+  header h1{margin:0 0 4px 0; font-size:1.45rem; font-weight:600;}
+  header p{margin:0; font-size:0.85rem; opacity:0.85;}
+  nav{
+    display:flex; gap:6px; background:#efe9d8; padding:8px 20px;
+    border-bottom:1px solid var(--line); flex-wrap:wrap;
+  }
+  .nav-group-title{
+    background:#e4dcc4; color:#6b5a2f; font-size:0.72rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.05em; padding:6px 20px 2px;
+  }
+  .crop-bar{
+    display:flex; align-items:center; gap:10px; background:#2f4d33; color:#f4f1e6;
+    padding:10px 20px; flex-wrap:wrap;
+  }
+  .crop-bar label{color:#d9e6d4; font-size:0.85rem; font-weight:600; margin:0;}
+  .crop-bar select{
+    background:#f4f1e6; border:none; border-radius:6px; padding:6px 10px; font-size:0.9rem;
+    font-weight:600; color:var(--ink); max-width:260px;
+  }
+  .crop-bar .crop-tag{
+    font-size:0.78rem; background:#5c8a56; padding:3px 10px; border-radius:12px; opacity:0.9;
+  }
+  nav button{
+    background:none; border:none; padding:9px 16px; font-size:0.92rem;
+    color:var(--muted); cursor:pointer; border-radius:6px 6px 0 0; font-weight:600;
+  }
+  nav button.active{background:var(--panel); color:var(--accent); box-shadow:0 -2px 0 var(--accent) inset;}
+  main{max-width:980px; margin:0 auto; padding:22px 20px 60px;}
+  section{display:none; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:24px 26px;}
+  section.active{display:block;}
+  h2{margin-top:0; font-size:1.15rem; color:var(--accent);}
+  h3{font-size:1.0rem; color:var(--accent2); margin-bottom:6px;}
+  p{line-height:1.5; font-size:0.92rem; color:#3a3930;}
+  .muted{color:var(--muted); font-size:0.82rem;}
+  .row{display:flex; gap:24px; flex-wrap:wrap;}
+  .col{flex:1 1 320px;}
+  label{font-size:0.85rem; font-weight:600; color:var(--muted); display:block; margin-bottom:4px;}
+  input[type=range]{width:100%;}
+  input[type=number], select{
+    width:100%; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font-size:0.9rem;
+  }
+  .pillbox{
+    display:inline-flex; align-items:center; gap:8px; background:#f0ede2; border:1px solid var(--line);
+    border-radius:20px; padding:6px 14px; font-weight:700; font-size:1.05rem; color:var(--accent);
+  }
+  .chart-wrap{margin-top:14px; overflow-x:auto;}
+  svg text{font-family:inherit;}
+  .legend-row{display:flex; align-items:center; gap:8px; margin-bottom:2px; font-size:0.8rem;}
+  .swatch{width:12px; height:12px; border-radius:3px; display:inline-block;}
+  table{border-collapse:collapse; width:100%; font-size:0.85rem; margin-top:10px;}
+  th,td{border:1px solid var(--line); padding:6px 8px; text-align:left;}
+  th{background:#f0ede2;}
+  .callout{
+    background:#eef4e9; border-left:4px solid var(--accent); padding:10px 14px; border-radius:6px;
+    font-size:0.87rem; margin-top:12px;
+  }
+  .callout.warn{background:#fbece6; border-left-color:var(--warn);}
+  .grid-materials{display:grid; grid-template-columns:1.4fr 0.7fr 0.7fr; gap:8px; align-items:center; font-size:0.85rem; margin-top:10px;}
+  .grid-materials div.hdr{font-weight:700; color:var(--muted); font-size:0.78rem;}
+  .result-box{
+    margin-top:16px; padding:16px; background:#f0ede2; border-radius:8px; display:flex;
+    gap:26px; flex-wrap:wrap; align-items:center;
+  }
+  .big-num{font-size:1.8rem; font-weight:700; color:var(--accent);}
+  .small-cap{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--muted);}
+  footer{text-align:center; padding:20px; font-size:0.75rem; color:var(--muted);}
+  .slider-value{font-weight:700; color:var(--accent);}
+  .flex-between{display:flex; justify-content:space-between; align-items:center;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Soil Chemistry &amp; Plant Nutrition</h1>
+  <p>An interactive teaching tool — UC Davis Advanced Irrigation Lab</p>
+</header>
+
+<div class="nav-group-title">Step 1 — Learn the fundamentals</div>
+<nav>
+  <button class="tab-btn active" data-tab="roles">1. Nutrient Roles &amp; Mobility</button>
+  <button class="tab-btn" data-tab="ph">2. Soil pH &amp; Availability</button>
+  <button class="tab-btn" data-tab="organic">3. Organic Matter &amp; CEC</button>
+  <button class="tab-btn" data-tab="limiting">4. Limiting Factors &amp; Interactions</button>
+</nav>
+<div class="nav-group-title">Step 2 — Diagnose &amp; apply</div>
+<nav>
+  <button class="tab-btn" data-tab="thresholds">5. Deficiency Thresholds</button>
+  <button class="tab-btn" data-tab="cropneeds">6. Crop-Specific Profiles</button>
+  <button class="tab-btn" data-tab="labreport">7. Lab Report &amp; Recommendations</button>
+</nav>
+
+<div class="crop-bar">
+  <label>Crop-specific model:</label>
+  <select id="cropSelect"></select>
+  <span class="crop-tag" id="cropTag">General / all-crop defaults</span>
+</div>
+
+<main>
+
+<!-- ===================== TAB 1: NUTRIENT ROLES & MOBILITY ===================== -->
+<section id="roles" class="active">
+
+
+  <h2>What Each Nutrient Actually Does</h2>
+  <p>A quick physiological reference — why plants need each essential element, grouped by primary function.</p>
+  <table>
+    <tr><th>Nutrient</th><th>Class</th><th>Primary role(s)</th></tr>
+    <tr><td>Nitrogen (N)</td><td>Macro</td><td>Amino acids, proteins, chlorophyll, nucleic acids — drives vegetative growth</td></tr>
+    <tr><td>Phosphorus (P)</td><td>Macro</td><td>ATP/energy transfer, root development, DNA/RNA, flowering &amp; seed set</td></tr>
+    <tr><td>Potassium (K)</td><td>Macro</td><td>Stomatal regulation, osmotic balance, enzyme activation, water-use efficiency</td></tr>
+    <tr><td>Calcium (Ca)</td><td>Macro (secondary)</td><td>Cell wall structure (middle lamella), membrane stability, signaling</td></tr>
+    <tr><td>Magnesium (Mg)</td><td>Macro (secondary)</td><td>Central atom of chlorophyll; enzyme cofactor for phosphorylation</td></tr>
+    <tr><td>Sulfur (S)</td><td>Macro (secondary)</td><td>Amino acids (cysteine, methionine), enzyme cofactors, oil synthesis</td></tr>
+    <tr><td>Iron (Fe)</td><td>Micro</td><td>Chlorophyll synthesis, electron transport (cytochromes), N fixation enzymes</td></tr>
+    <tr><td>Manganese (Mn)</td><td>Micro</td><td>Photosystem II water-splitting, enzyme activation, lignin synthesis</td></tr>
+    <tr><td>Zinc (Zn)</td><td>Micro</td><td>Auxin (growth hormone) synthesis, enzyme structure, internode elongation</td></tr>
+    <tr><td>Copper (Cu)</td><td>Micro</td><td>Lignin synthesis, electron transport, pollen viability</td></tr>
+    <tr><td>Boron (B)</td><td>Micro</td><td>Cell wall cross-linking, pollen tube growth, sugar transport</td></tr>
+    <tr><td>Molybdenum (Mo)</td><td>Micro</td><td>Nitrate reductase &amp; nitrogenase — essential for N metabolism/fixation</td></tr>
+    <tr><td>Chlorine (Cl)</td><td>Micro</td><td>Osmotic regulation, photosystem II, disease resistance in some crops</td></tr>
+    <tr><td>Nickel (Ni)</td><td>Micro</td><td>Urease enzyme cofactor — required for urea nitrogen metabolism</td></tr>
+  </table>
+
+  <h3 style="margin-top:26px;">Mobility &amp; Deficiency Symptom Location</h3>
+  <div class="callout" id="cropDeficiencyNote" style="display:none;"></div>
+  <p>Some nutrients can be resorbed from old tissue and shuttled to new growth when supply runs short
+  (<strong>mobile</strong>); others, once deposited, stay put (<strong>immobile</strong>). This single property
+  predicts <em>where on the plant</em> a deficiency symptom will first appear — a fast, practical diagnostic shortcut.</p>
+
+  <div class="row">
+    <div class="col">
+      <label>Click a nutrient to see its symptom pattern:</label>
+      <div id="mobilityButtons" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;"></div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:14px;">
+    <div class="col">
+      <svg id="plantDiagram" width="260" height="340" viewBox="0 0 260 340"></svg>
+    </div>
+    <div class="col">
+      <div class="callout" id="mobilityInfo">Select a nutrient above.</div>
+      <table style="margin-top:14px;">
+        <tr><th>Mobile (old leaves first)</th><th>Immobile (new growth first)</th></tr>
+        <tr><td>N, P, K, Mg, Mo, Cl</td><td>Ca, S, Fe, Mn, Zn, Cu, B</td></tr>
+      </table>
+      <p class="muted">S is a partial exception — technically somewhat mobile, but often behaves more like N in the field, so labs sometimes list it either way.</p>
+    </div>
+  </div>
+
+
+</section>
+
+<!-- ===================== TAB 2: SOIL pH & AVAILABILITY ===================== -->
+<section id="ph">
+
+
+  <h2>How Soil pH Controls Nutrient Availability</h2>
+  <p>Soil pH doesn't add or remove nutrients directly — it changes their <em>chemical form</em> and solubility,
+  which determines how much of each nutrient is actually dissolved in soil solution and accessible to roots.
+  Drag the slider to see how the availability "window" shifts for each nutrient.</p>
+
+  <div class="row">
+    <div class="col" style="flex-basis:100%;">
+      <div class="flex-between">
+        <label style="margin-bottom:0;">Soil pH: <span class="slider-value" id="phLabel">6.5</span></label>
+        <span class="muted" id="phZone">Slightly acidic — near-optimal for most nutrients</span>
+      </div>
+      <input type="range" id="phSlider" min="4" max="10" step="0.1" value="6.5">
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <svg id="phChart" width="920" height="430"></svg>
+  </div>
+
+  <div class="callout" id="phSummary">Select a pH value to see a summary.</div>
+  <div class="callout" id="cropPhNote" style="display:none;"></div>
+
+  <h3 style="margin-top:22px;">Why this happens</h3>
+  <table>
+    <tr><th>pH range</th><th>Mechanism</th></tr>
+    <tr><td>&lt; 5.5 (strongly acidic)</td><td>Al³⁺ and Mn²⁺ dissolve into toxic concentrations; P binds tightly to Fe/Al oxides; Ca, Mg, K, Mo become scarce or leach easily.</td></tr>
+    <tr><td>5.5 – 7.5 (near-neutral)</td><td>Widest availability window — most macro- and micronutrients are in soluble, plant-usable forms simultaneously. This is why ~6.0–7.0 is the general target for most crops.</td></tr>
+    <tr><td>&gt; 7.5 (alkaline / calcareous)</td><td>Fe, Mn, Zn, Cu, and B precipitate as insoluble hydroxides/carbonates ("lime-induced chlorosis"); P re-precipitates with Ca; Mo availability actually increases.</td></tr>
+  </table>
+
+  <h3 style="margin-top:26px;">Nitrogen Form &amp; the Rhizosphere pH Feedback Loop</h3>
+  <p>The form of N a root absorbs changes the local (rhizosphere) pH — which then feeds back into the
+  micro-scale nutrient availability right at the root surface, on top of the bulk-soil pH effects shown above.</p>
+
+  <div class="row">
+    <div class="col">
+      <h3>NH₄⁺ (ammonium) uptake</h3>
+      <p>Roots take in a positive ion, so they release H⁺ to balance charge → <strong>rhizosphere acidifies</strong>.
+      Common with ammonium-based or urea fertilizers, especially in cooler/wetter soils where nitrification is slow.</p>
+    </div>
+    <div class="col">
+      <h3>NO₃⁻ (nitrate) uptake</h3>
+      <p>Roots take in a negative ion, so they release OH⁻/HCO₃⁻ to balance charge → <strong>rhizosphere alkalinizes</strong>.
+      Common in warm, well-aerated, biologically active soils where nitrification runs fast.</p>
+    </div>
+  </div>
+  <div class="callout">Practical implication: on already-alkaline, high-pH soils (see above), favoring NH₄⁺/urea-based N sources can locally counteract micronutrient lockout at the root surface. On acidic soils prone to Al toxicity, NO₃⁻-based sources can help avoid further local acidification.</div>
+
+
+</section>
+
+<!-- ===================== TAB 3: ORGANIC MATTER, CARBON & CEC ===================== -->
+<section id="organic">
+
+<h2>Soil Organic Matter, Carbon &amp; C:N Ratio</h2>
+  <p>Organic matter, its carbon content, the cation exchange capacity it helps create, and the C:N ratio of
+  the residues that build it are all facets of the same underlying pool — soil organic matter (SOM). This tab
+  walks through how they're measured, what they do for the soil, and how residue chemistry drives decomposition.</p>
+  <div class="callout" id="cropResidueNote" style="display:none;"></div>
+
+
+  <h3>Organic Carbon vs. Soil Organic Matter</h3>
+  <p>Soil organic matter (SOM) is not pure carbon — it's a mix of carbon, hydrogen, oxygen, nitrogen and other
+  elements bound into humus, roots, microbial biomass, and residues. Labs typically measure
+  <strong>%OC (organic carbon)</strong> directly by combustion, then convert to <strong>%SOM</strong> using the
+  van Bemmelen factor, since SOM is conventionally assumed to be ~58% carbon by weight (1 ÷ 0.58 ≈ 1.724).</p>
+
+  <div class="row">
+    <div class="col">
+      <h3>Convert %OC ⇄ %SOM</h3>
+      <label>% Organic Carbon (from lab combustion / Walkley-Black)</label>
+      <input type="range" id="ocSlider" min="0" max="8" step="0.05" value="1.5">
+      <div class="flex-between muted"><span>0%</span><span class="slider-value" id="ocLabel">1.50%</span><span>8%</span></div>
+
+      <label style="margin-top:14px;">Conversion factor (van Bemmelen)</label>
+      <input type="range" id="factorSlider" min="1.7" max="2.0" step="0.01" value="1.724">
+      <div class="flex-between muted"><span>1.70 (older mineral-soil default)</span><span class="slider-value" id="factorLabel">1.724</span><span>2.00 (organic/peat soils)</span></div>
+
+      <div class="result-box">
+        <div><div class="small-cap">Organic carbon</div><div class="big-num" id="ocOut">1.50%</div></div>
+        <div><div class="small-cap">→ Organic matter</div><div class="big-num" id="somOut">2.59%</div></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <h3>Why it matters agronomically</h3>
+      <p>Each 1% increase in SOM in the top 15 cm roughly corresponds to:</p>
+      <ul style="font-size:0.88rem; line-height:1.55;">
+        <li>~1,000–1,200 kg ha⁻¹ additional water-holding capacity</li>
+        <li>A slow-release reservoir of N, P, and S mineralized by microbial activity</li>
+        <li>Better soil aggregation, infiltration, and resistance to compaction</li>
+      </ul>
+      <div class="callout">Typical mineral agricultural soils: 1–6% SOM (0.6–3.5% OC). Peat/organic soils: &gt;20% SOM.</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:26px;">Cation Exchange Capacity &amp; Base Saturation</h3>
+  <p>CEC is the soil's capacity to hold positively charged nutrients (Ca²⁺, Mg²⁺, K⁺, NH₄⁺) on negatively charged clay and organic matter surfaces — directly boosted by the organic matter discussed above — think of it as the soil's "nutrient bank account." Base saturation describes
+  what fraction of that account is filled with base cations versus acidic H⁺/Al³⁺.</p>
+
+  <div class="row">
+    <div class="col">
+      <label>Clay content (%)</label>
+      <input type="range" id="claySlider" min="0" max="60" step="1" value="25">
+      <div class="flex-between muted"><span>0%</span><span class="slider-value" id="clayLabel">25%</span><span>60%</span></div>
+
+      <label style="margin-top:12px;">Soil organic matter (%)</label>
+      <input type="range" id="somCecSlider" min="0" max="8" step="0.1" value="2.5">
+      <div class="flex-between muted"><span>0%</span><span class="slider-value" id="somCecLabel">2.5%</span><span>8%</span></div>
+
+      <div class="result-box">
+        <div><div class="small-cap">Estimated CEC</div><div class="big-num" id="cecOut">—</div><div class="muted">cmol(+)/kg</div></div>
+      </div>
+      <p class="muted">Rough estimate: clay ≈ 0.5–1.0 cmol/kg per %, montmorillonitic assumption; SOM ≈ 2 cmol/kg per % — illustrative only, texture/mineralogy vary widely.</p>
+    </div>
+    <div class="col">
+      <label>Base cation distribution on exchange sites</label>
+      <div id="baseSatChart" style="margin-top:8px;"></div>
+      <div class="callout">Agronomic target is typically ~65–85% Ca, 6–12% Mg, 2–5% K of total CEC, with H⁺/Al³⁺ making up the rest in acid soils. Very low base saturation (&lt;50%) usually coincides with low pH and Al toxicity risk.</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:26px;">C:N Ratio &amp; Decomposition</h3>
+  <p>Soil microbes need roughly <strong>24 units of carbon for every 1 unit of nitrogen</strong> to build their own
+  biomass. If the residue they're decomposing has a much wider ratio than that, they scavenge mineral N from the
+  soil (<em>immobilization</em>) — temporarily competing with your crop. A narrower ratio releases surplus N into
+  the soil (<em>mineralization</em>), feeding plants.</p>
+
+  <div class="row">
+    <div class="col">
+      <h3>Blend calculator</h3>
+      <p class="muted">Set the relative mass proportions of two organic inputs to see the resulting blended C:N ratio.</p>
+      <div class="grid-materials">
+        <div class="hdr">Material</div><div class="hdr">C:N ratio</div><div class="hdr">Mass share</div>
+
+        <select id="matA">
+          <option value="12">Fresh legume residue / clover (12:1)</option>
+          <option value="15" selected>Cattle manure, fresh (15:1)</option>
+          <option value="20">Grass clippings (20:1)</option>
+          <option value="25">Mature compost (25:1)</option>
+          <option value="60">Cereal straw (wheat) (60:1)</option>
+          <option value="80">Corn stover (80:1)</option>
+          <option value="400">Sawdust / wood chips (400:1)</option>
+          <option value="500">Newspaper (500:1)</option>
+        </select>
+        <input type="number" id="matA_ratio" value="15" min="1" max="600">
+        <input type="range" id="matA_share" min="0" max="100" value="50">
+
+        <select id="matB">
+          <option value="12">Fresh legume residue / clover (12:1)</option>
+          <option value="15">Cattle manure, fresh (15:1)</option>
+          <option value="20">Grass clippings (20:1)</option>
+          <option value="25">Mature compost (25:1)</option>
+          <option value="60" selected>Cereal straw (wheat) (60:1)</option>
+          <option value="80">Corn stover (80:1)</option>
+          <option value="400">Sawdust / wood chips (400:1)</option>
+          <option value="500">Newspaper (500:1)</option>
+        </select>
+        <input type="number" id="matB_ratio" value="60" min="1" max="600">
+        <input type="range" id="matB_share" min="0" max="100" value="50">
+      </div>
+      <p class="muted" id="shareNote" style="margin-top:6px;">Shares are normalized automatically (they don't need to sum to 100).</p>
+    </div>
+
+    <div class="col">
+      <h3>Result</h3>
+      <div class="result-box">
+        <div>
+          <div class="small-cap">Blended C:N</div>
+          <div class="big-num" id="cnResult">—</div>
+        </div>
+        <div style="flex:1; min-width:220px;">
+          <div id="cnBarTrack" style="position:relative; height:26px; background:linear-gradient(to right,#3d6b46 0%,#3d6b46 33%,#c9a227 33%,#c9a227 55%,#b3462c 55%,#b3462c 100%); border-radius:6px;">
+            <div id="cnMarker" style="position:absolute; top:-6px; width:3px; height:38px; background:#222;"></div>
+          </div>
+          <div class="flex-between muted" style="font-size:0.72rem; margin-top:4px;">
+            <span>10:1</span><span>~24:1 (equilibrium)</span><span>~30:1</span><span>100:1+</span>
+          </div>
+        </div>
+      </div>
+      <div class="callout" id="cnVerdict">—</div>
+    </div>
+  </div>
+
+
+</section>
+
+<!-- ===================== TAB 4: LIMITING FACTORS & INTERACTIONS ===================== -->
+<section id="limiting">
+
+
+  <h2>Limiting Factors &amp; Nutrient Interactions</h2>
+  <h3>Liebig's Law of the Minimum</h3>
+  <p>Crop yield is capped by whichever essential nutrient is <em>scarcest relative to demand</em> —
+  not by the average or sum of all nutrients supplied. Classically illustrated as a barrel: the shortest
+  stave sets how much water (yield) the barrel can hold, no matter how tall the other staves are.</p>
+
+  <div class="row">
+    <div class="col" style="flex-basis:100%;">
+      <p class="muted">Adjust each nutrient's relative supply (0–100% of crop demand), or apply a crop's typical relative demand pattern below. The barrel fills only to the shortest stave.</p>
+      <div class="callout" id="cropDemandNote" style="display:none; margin-bottom:10px;"></div>
+      <div id="liebigSliders" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:10px; align-items:flex-start;">
+    <div class="col">
+      <svg id="barrelSvg" width="360" height="260" viewBox="0 0 360 260"></svg>
+    </div>
+    <div class="col">
+      <div class="result-box">
+        <div><div class="small-cap">Limiting nutrient</div><div class="big-num" id="limitingNutrient" style="font-size:1.4rem;">—</div></div>
+        <div><div class="small-cap">Effective yield potential</div><div class="big-num" id="limitingYield">—</div></div>
+      </div>
+      <div class="callout">Raising any non-limiting nutrient does nothing for yield until the limiting one is addressed — a core reason balanced fertility programs outperform "more of everything" approaches.</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:26px;">Nutrient Interactions &amp; Antagonism</h3>
+  <p>Nutrients don't act in isolation — applying one in excess can physically or chemically block uptake of another,
+  usually because they compete for the same root uptake transporters or exchange sites. Select a nutrient to see
+  what it commonly antagonizes or synergizes with.</p>
+
+  <div class="row">
+    <div class="col">
+      <label>Nutrient applied in excess:</label>
+      <select id="interactSelect">
+        <option value="K">Potassium (K)</option>
+        <option value="P">Phosphorus (P)</option>
+        <option value="Ca">Calcium (Ca)</option>
+        <option value="N_NH4">Ammonium-N (NH₄⁺)</option>
+        <option value="Na">Sodium (Na, salinity)</option>
+      </select>
+    </div>
+  </div>
+  <div class="callout" id="interactionResult" style="margin-top:14px;">Select a nutrient above.</div>
+
+
+</section>
+
+<!-- ===================== TAB 5: DEFICIENCY THRESHOLDS & CHECKER ===================== -->
+<section id="thresholds">
+  <h2>Deficiency Thresholds &amp; Checker</h2>
+  <p>Once you know a symptom's location (previous tab), the next step is confirming it against real numbers.
+  This reference translates soil test and plant tissue lab reports into deficient / sufficient / excessive calls.</p>
+
+  <h3 style="margin-top:26px;">Deficiency Threshold Reference Values</h3>
+  <p>Deficiency is diagnosed against two kinds of measured numbers: a <strong>soil test critical level</strong>
+  (below which a fertilizer response is expected) and a <strong>plant tissue sufficiency range</strong> (from
+  lab analysis of a specific leaf position, usually the most recently matured leaf). Exact cutoffs vary by
+  lab, extraction method, crop, and growth stage — the figures below are commonly cited general reference
+  ranges for row/vegetable crops, not a substitute for a lab's own calibrated ranges.</p>
+
+  <div class="chart-wrap">
+    <table>
+      <tr><th>Nutrient</th><th>Soil test method</th><th>Soil deficient below</th><th>Soil sufficient range</th><th>Tissue deficient below</th><th>Tissue sufficient range</th></tr>
+      <tr><td>N</td><td>NO₃-N, 0–30 cm</td><td>10 ppm</td><td>15–40 ppm</td><td>2.0%</td><td>2.5–4.0%</td></tr>
+      <tr><td>P</td><td>Olsen (bicarbonate)</td><td>8 ppm</td><td>15–30 ppm</td><td>0.15%</td><td>0.20–0.50%</td></tr>
+      <tr><td>K</td><td>Ammonium acetate (exch.)</td><td>60 ppm</td><td>100–200 ppm</td><td>1.0%</td><td>1.5–3.0%</td></tr>
+      <tr><td>Ca</td><td>Ammonium acetate (exch.)</td><td>400 ppm</td><td>800–2000 ppm</td><td>0.3%</td><td>0.5–2.0%</td></tr>
+      <tr><td>Mg</td><td>Ammonium acetate (exch.)</td><td>40 ppm</td><td>60–150 ppm</td><td>0.15%</td><td>0.25–0.60%</td></tr>
+      <tr><td>S</td><td>Monocalcium phosphate (SO₄-S)</td><td>5 ppm</td><td>8–20 ppm</td><td>0.10%</td><td>0.15–0.30%</td></tr>
+      <tr><td>Fe</td><td>DTPA</td><td>2.0 ppm</td><td>2.5–10 ppm</td><td>40 ppm</td><td>50–150 ppm</td></tr>
+      <tr><td>Mn</td><td>DTPA</td><td>1.0 ppm</td><td>1.5–10 ppm</td><td>15 ppm</td><td>20–100 ppm</td></tr>
+      <tr><td>Zn</td><td>DTPA</td><td>0.5 ppm</td><td>0.8–2.5 ppm</td><td>15 ppm</td><td>20–50 ppm</td></tr>
+      <tr><td>Cu</td><td>DTPA</td><td>0.2 ppm</td><td>0.3–1.5 ppm</td><td>4 ppm</td><td>5–15 ppm</td></tr>
+      <tr><td>B</td><td>Hot-water extraction</td><td>0.3 ppm</td><td>0.5–2.0 ppm</td><td>15 ppm</td><td>20–60 ppm</td></tr>
+      <tr><td>Mo</td><td>Ammonium oxalate</td><td>0.05 ppm</td><td>0.1–0.3 ppm</td><td>0.05 ppm</td><td>0.1–1.0 ppm</td></tr>
+    </table>
+  </div>
+
+  <h3 style="margin-top:22px;">Check a value</h3>
+  <p class="muted">Pick a nutrient and test type, enter a measured value, and see how it classifies against the reference ranges above.</p>
+  <div class="row">
+    <div class="col">
+      <label>Nutrient</label>
+      <select id="threshNutrient"></select>
+    </div>
+    <div class="col">
+      <label>Test type</label>
+      <select id="threshTestType">
+        <option value="soil">Soil test</option>
+        <option value="tissue">Plant tissue</option>
+      </select>
+    </div>
+    <div class="col">
+      <label>Measured value (<span id="threshUnit">—</span>)</label>
+      <input type="number" id="threshValue" step="any" value="6">
+    </div>
+  </div>
+  <div class="result-box">
+    <div>
+      <div class="small-cap">Classification</div>
+      <div class="big-num" id="threshResult" style="font-size:1.4rem;">—</div>
+    </div>
+    <div style="flex:1; min-width:220px;" id="threshBarWrap"></div>
+  </div>
+
+
+</section>
+
+<!-- ===================== TAB 6: CROP-SPECIFIC PROFILES ===================== -->
+<section id="cropneeds">
+
+
+  <h2>Typical Crop Nutrient Requirements</h2>
+  <p>Total nutrient uptake for a mature crop, from planting to harvest — use the crop selector at the top of the
+  page to highlight one crop's profile below the comparison table.
+  <span class="muted">Values are illustrative order-of-magnitude figures for teaching, not a fertilizer
+  recommendation — actual removal depends heavily on yield, cultivar, and region.</span></p>
+
+  <div class="chart-wrap">
+    <table id="cropNeedsTable">
+      <tr><th>Crop</th><th>N</th><th>P₂O₅</th><th>K₂O</th><th>S</th><th>Ca</th><th>Mg</th><th>Yield basis</th></tr>
+    </table>
+  </div>
+  <p class="muted">All values kg/ha total uptake (nutrient removed in harvested biomass + residue).</p>
+
+  <div id="cropNeedsDetail" style="margin-top:20px; display:none;">
+    <h3 id="cropNeedsDetailTitle">—</h3>
+    <div class="row">
+      <div class="col">
+        <div id="cropNeedsBars"></div>
+      </div>
+      <div class="col">
+        <div class="callout" id="cropNeedsStageNote">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="callout" id="cropNeedsPlaceholder">Select a crop from the dropdown at the top of the page to see its individual nutrient-uptake profile and peak-demand timing highlighted here.</div>
+
+
+</section>
+
+<!-- ===================== TAB 7: LAB REPORT ANALYZER & RECOMMENDATIONS ===================== -->
+<section id="labreport">
+
+
+  <h2>Lab Report Analyzer &amp; Recommendations</h2>
+  <p>Enter values from a soil test or plant tissue analysis report and the tool will classify each nutrient
+  against the reference ranges from the Deficiency Thresholds tab and generate general management recommendations.
+  Leave any field blank if it wasn't measured. Select a crop from the dropdown at the top of the page first for
+  crop-specific pH context.</p>
+  <div class="callout warn">These are general, principle-level teaching recommendations based on published
+  reference ranges — not a substitute for a certified nutrient management plan, which should account for
+  yield goals, irrigation water quality, prior fertilization, and local regulations.</div>
+
+  <div class="row" style="margin-top:14px;">
+    <div class="col">
+      <label>Sample type</label>
+      <select id="labTestType">
+        <option value="soil">Soil test</option>
+        <option value="tissue">Plant tissue test</option>
+      </select>
+    </div>
+    <div class="col">
+      <label>Soil pH (from the same report, if available)</label>
+      <input type="number" id="labPh" step="0.1" placeholder="e.g. 6.4">
+    </div>
+  </div>
+
+  <h3 style="margin-top:20px;">Enter measured values</h3>
+  <div id="labInputsGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px;"></div>
+
+  <h3 style="margin-top:24px;">Classification</h3>
+  <div class="chart-wrap">
+    <table id="labResultsTable">
+      <tr><th>Nutrient</th><th>Value</th><th>Status</th></tr>
+    </table>
+  </div>
+
+  <h3 style="margin-top:24px;">Recommendations</h3>
+  <div id="labRecommendations"></div>
+
+
+</section>
+
+</main>
+
+<footer>Educational tool — approximate, illustrative curves based on standard soil-science references (not a substitute for a site-specific soil test).</footer>
+
+<script>
+// ---------- TAB SWITCHING ----------
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- CROP MODEL STATE (populated below; declared early so early chart builds are safe) ----------
+let cropData = {};
+let currentCropKey = "";
+
+// ---------- TAB 1: pH CHART ----------
+// Availability curves (0-100 relative availability) at pH points 4..10 step 0.5
+// Approximate illustrative values based on standard soil-science availability diagrams (Truog-type).
+const phPoints = [4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0];
+const nutrients = [
+  {name:"Nitrogen (N)",   color:"#2f6b3c", data:[20,35,55,75,90,95,95,90,80,65,50,35,25]},
+  {name:"Phosphorus (P)", color:"#c9a227", data:[10,20,35,60,85,95,95,85,55,35,20,12,8]},
+  {name:"Potassium (K)",  color:"#7a4fa3", data:[25,35,50,70,88,95,95,92,88,80,70,60,50]},
+  {name:"Sulfur (S)",     color:"#e0a13b", data:[30,40,55,75,88,95,95,90,80,68,55,45,35]},
+  {name:"Calcium (Ca)",   color:"#4a90d9", data:[15,25,40,60,78,90,95,97,98,98,97,95,92]},
+  {name:"Magnesium (Mg)", color:"#57a0a8", data:[18,28,42,62,80,90,95,95,95,92,88,82,75]},
+  {name:"Iron (Fe)",      color:"#a85c32", data:[95,92,88,80,68,52,35,20,10,6,4,3,2]},
+  {name:"Manganese (Mn)", color:"#8a6d3b", data:[98,95,90,78,60,42,28,15,8,5,4,3,2]},
+  {name:"Boron (B)",      color:"#c98a3d", data:[55,65,78,88,92,92,88,78,62,48,38,30,25]},
+  {name:"Copper (Cu)",    color:"#b5651d", data:[92,90,85,75,62,48,35,22,14,10,7,5,4]},
+  {name:"Zinc (Zn)",      color:"#6b7a8f", data:[90,88,82,72,58,44,30,18,10,7,5,4,3]},
+  {name:"Molybdenum (Mo)",color:"#5c7a3d", data:[5,8,12,20,32,48,65,80,90,95,97,98,98]},
+  {name:"Al toxicity risk",color:"#b3462c", data:[95,85,60,25,8,3,1,0,0,0,0,0,0]}
+];
+
+function interp(data, ph){
+  // linear interpolate between phPoints
+  if(ph<=phPoints[0]) return data[0];
+  if(ph>=phPoints[phPoints.length-1]) return data[data.length-1];
+  for(let i=0;i<phPoints.length-1;i++){
+    if(ph>=phPoints[i] && ph<=phPoints[i+1]){
+      const t=(ph-phPoints[i])/(phPoints[i+1]-phPoints[i]);
+      return data[i] + t*(data[i+1]-data[i]);
+    }
+  }
+  return data[data.length-1];
+}
+
+const svg = document.getElementById('phChart');
+const marginLeft = 140, marginRight = 40, marginTop = 16, chartW = 920 - marginLeft - marginRight;
+const rowH = 26, rowGap = 6;
+const phMin=4, phMax=10;
+
+function xForPh(ph){ return marginLeft + (ph-phMin)/(phMax-phMin)*chartW; }
+
+function buildStaticChart(){
+  let svgContent = '';
+  svgContent += `<g id="cropBandLayer"></g>`;
+  // x-axis gridlines/labels
+  for(let p=4;p<=10;p+=1){
+    const x = xForPh(p);
+    svgContent += `<line x1="${x}" y1="${marginTop}" x2="${x}" y2="${marginTop + nutrients.length*(rowH+rowGap)}" stroke="#e2ddd0" stroke-width="1"/>`;
+    svgContent += `<text x="${x}" y="${marginTop + nutrients.length*(rowH+rowGap)+16}" font-size="11" fill="#6b6a5f" text-anchor="middle">${p}</text>`;
+  }
+  nutrients.forEach((n,i)=>{
+    const y = marginTop + i*(rowH+rowGap);
+    svgContent += `<text x="${marginLeft-10}" y="${y+rowH*0.68}" font-size="12" fill="#2b2a25" text-anchor="end">${n.name}</text>`;
+    // background track
+    svgContent += `<rect x="${marginLeft}" y="${y}" width="${chartW}" height="${rowH}" fill="#f0ede2" rx="4"/>`;
+    // availability curve as filled path (opacity intensity)
+    let path = `M ${xForPh(phMin)} ${y+rowH}`;
+    phPoints.forEach(p=>{
+      const avail = interp(n.data, p)/100;
+      const yy = y + rowH - avail*rowH;
+      path += ` L ${xForPh(p)} ${yy}`;
+    });
+    path += ` L ${xForPh(phMax)} ${y+rowH} Z`;
+    svgContent += `<path d="${path}" fill="${n.color}" fill-opacity="0.55" stroke="${n.color}" stroke-width="1.5"/>`;
+  });
+  svg.innerHTML = svgContent + `<g id="phIndicatorLayer"></g>`;
+  updateCropBand();
+}
+buildStaticChart();
+
+function updateCropBand(){
+  const layer = document.getElementById('cropBandLayer');
+  if(!layer) return;
+  const crop = cropData[currentCropKey];
+  const totalH = marginTop + nutrients.length*(rowH+rowGap) - rowGap;
+  if(!crop || !crop.phMin){ layer.innerHTML=''; return; }
+  const x1 = xForPh(crop.phMin), x2 = xForPh(crop.phMax);
+  layer.innerHTML = `<rect x="${x1}" y="${marginTop-4}" width="${x2-x1}" height="${totalH-marginTop+8}" fill="#3d6b46" fill-opacity="0.12" stroke="#3d6b46" stroke-width="1" stroke-dasharray="2,2"/>
+    <text x="${(x1+x2)/2}" y="${marginTop-8}" font-size="10" fill="#3d6b46" text-anchor="middle" font-weight="700">${crop.name} optimal</text>`;
+}
+
+function updatePhIndicator(ph){
+  const x = xForPh(ph);
+  const totalH = marginTop + nutrients.length*(rowH+rowGap) - rowGap;
+  const layer = document.getElementById('phIndicatorLayer');
+  layer.innerHTML = `<line x1="${x}" y1="${marginTop-4}" x2="${x}" y2="${totalH+4}" stroke="#2b2a25" stroke-width="2" stroke-dasharray="4,3"/>
+    <polygon points="${x-6},${marginTop-4} ${x+6},${marginTop-4} ${x},${marginTop+6}" fill="#2b2a25"/>`;
+}
+
+function phZoneText(ph){
+  if(ph<5.0) return "Strongly acidic — Al/Mn toxicity risk rising, P and most macros restricted";
+  if(ph<5.5) return "Acidic — P, K, Ca, Mg limited; Fe/Mn/Cu/Zn abundant";
+  if(ph<6.0) return "Moderately acidic — approaching optimal range for most nutrients";
+  if(ph<7.5) return "Near-neutral — broadest availability window for most nutrients";
+  if(ph<8.0) return "Mildly alkaline — micronutrients (Fe, Mn, Zn, Cu) beginning to decline";
+  if(ph<9.0) return "Alkaline — Fe/Mn/Zn/Cu/B scarce, P re-precipitating; Mo abundant";
+  return "Strongly alkaline / sodic risk — most micronutrients severely limited";
+}
+
+function topLimiting(ph){
+  const vals = nutrients.map(n=>({name:n.name, v:interp(n.data,ph)}));
+  vals.sort((a,b)=>a.v-b.v);
+  return vals.slice(0,3).filter(v=>v.name!=="Al toxicity risk").slice(0,2);
+}
+
+function updatePh(){
+  const ph = parseFloat(document.getElementById('phSlider').value);
+  document.getElementById('phLabel').textContent = ph.toFixed(1);
+  document.getElementById('phZone').textContent = phZoneText(ph);
+  updatePhIndicator(ph);
+  const limiting = topLimiting(ph);
+  const alRisk = interp(nutrients.find(n=>n.name.includes('Al')).data, ph);
+  let summary = `At pH ${ph.toFixed(1)}, the most limited nutrients are <strong>${limiting.map(l=>l.name).join(' and ')}</strong>.`;
+  if(alRisk>50) summary += ` Aluminum solubility is high enough to risk root-toxicity symptoms in sensitive crops.`;
+  document.getElementById('phSummary').innerHTML = summary;
+}
+document.getElementById('phSlider').addEventListener('input', updatePh);
+updatePh();
+
+// ---------- TAB 2: C:N CALCULATOR ----------
+function syncRatioFromSelect(selectId, ratioId){
+  const sel = document.getElementById(selectId);
+  document.getElementById(ratioId).value = sel.value;
+}
+['A','B'].forEach(k=>{
+  document.getElementById('mat'+k).addEventListener('change', ()=>{
+    syncRatioFromSelect('mat'+k, 'mat'+k+'_ratio');
+    updateCN();
+  });
+  document.getElementById('mat'+k+'_ratio').addEventListener('input', updateCN);
+  document.getElementById('mat'+k+'_share').addEventListener('input', updateCN);
+});
+
+function updateCN(){
+  const rA = parseFloat(document.getElementById('matA_ratio').value)||1;
+  const rB = parseFloat(document.getElementById('matB_ratio').value)||1;
+  let sA = parseFloat(document.getElementById('matA_share').value);
+  let sB = parseFloat(document.getElementById('matB_share').value);
+  if(sA+sB===0){sA=50;sB=50;}
+  const wA = sA/(sA+sB), wB = sB/(sA+sB);
+  // Blend by weighted harmonic-style mixing of C and N pools assuming equal mass basis:
+  // Approximate blended ratio using mass-weighted C and N shares (C ∝ ratio, N ∝ 1 unit per mass)
+  const blended = 1/( (wA/rA) + (wB/rB) );
+  document.getElementById('cnResult').textContent = blended.toFixed(1)+":1";
+
+  // marker position on 10-100+ scale (clamped)
+  const minR=10, maxR=100;
+  const clamped = Math.max(minR, Math.min(maxR, blended));
+  const pct = (clamped-minR)/(maxR-minR)*100;
+  document.getElementById('cnMarker').style.left = `calc(${pct}% - 1px)`;
+
+  let verdict;
+  if(blended<20){
+    verdict = `<strong>Net mineralization.</strong> This blend is nitrogen-rich relative to carbon — microbes will release surplus N into the soil as they decompose it, making it available to plants relatively quickly.`;
+  } else if(blended<=30){
+    verdict = `<strong>Near equilibrium (~24:1).</strong> Microbial N demand roughly matches supply from the residue itself — little net N is released or tied up.`;
+  } else {
+    verdict = `<strong>Net immobilization.</strong> Microbes decomposing this carbon-rich blend will scavenge mineral N from the soil, temporarily reducing N available to your crop until the ratio narrows.`;
+  }
+  document.getElementById('cnVerdict').innerHTML = verdict;
+}
+updateCN();
+
+// ---------- TAB 3: OC / SOM CONVERTER ----------
+function updateOM(){
+  const oc = parseFloat(document.getElementById('ocSlider').value);
+  const factor = parseFloat(document.getElementById('factorSlider').value);
+  document.getElementById('ocLabel').textContent = oc.toFixed(2)+'%';
+  document.getElementById('factorLabel').textContent = factor.toFixed(3);
+  document.getElementById('ocOut').textContent = oc.toFixed(2)+'%';
+  document.getElementById('somOut').textContent = (oc*factor).toFixed(2)+'%';
+}
+document.getElementById('ocSlider').addEventListener('input', updateOM);
+document.getElementById('factorSlider').addEventListener('input', updateOM);
+updateOM();
+
+// ---------- TAB 4: MOBILITY & DEFICIENCY DIAGNOSIS ----------
+const mobilityData = {
+  N:  {mobile:true,  symptom:"Uniform yellowing (chlorosis) beginning in the oldest leaves and moving upward; overall stunted, pale growth."},
+  P:  {mobile:true,  symptom:"Older leaves turn dark green to purplish; delayed maturity; poor root development."},
+  K:  {mobile:true,  symptom:"Marginal and tip chlorosis/scorch on older leaves first; weak stems, lodging."},
+  Mg: {mobile:true,  symptom:"Interveinal chlorosis on older leaves — veins stay green while tissue between them yellows."},
+  Mo: {mobile:true,  symptom:"Interveinal mottling on older leaves; classic 'whiptail' leaf distortion in brassicas."},
+  Cl: {mobile:true,  symptom:"Wilting and chlorosis beginning in older leaves; true field deficiency is rare."},
+  Ca: {mobile:false, symptom:"Distorted, hooked, or necrotic NEW growth; blossom-end rot in fruit; root tip dieback."},
+  S:  {mobile:false, symptom:"Uniform pale-yellow chlorosis starting in NEW growth — mimics N deficiency but begins at the top of the plant."},
+  Fe: {mobile:false, symptom:"Interveinal chlorosis in NEW leaves with veins staying green — classic 'iron chlorosis'."},
+  Mn: {mobile:false, symptom:"Interveinal chlorosis with fine mottling in NEW leaves."},
+  Zn: {mobile:false, symptom:"Shortened internodes and small new leaves ('little leaf' / rosetting); interveinal chlorosis in NEW growth."},
+  Cu: {mobile:false, symptom:"Wilting and dieback of NEW shoot tips; distorted, twisted new leaves."},
+  B:  {mobile:false, symptom:"Death of growing points; brittle, distorted NEW growth; hollow stems/roots."}
+};
+const mobBtnWrap = document.getElementById('mobilityButtons');
+Object.keys(mobilityData).forEach(k=>{
+  const b = document.createElement('button');
+  b.textContent = k;
+  b.style.cssText = "padding:6px 12px;border:1px solid var(--line);border-radius:16px;background:#f0ede2;cursor:pointer;font-weight:700;font-size:0.82rem;";
+  b.addEventListener('click', ()=>selectMobility(k, b));
+  mobBtnWrap.appendChild(b);
+});
+function drawPlant(highlightOldTier){
+  const svg = document.getElementById('plantDiagram');
+  const levels = [ {y:290, tier:'old'}, {y:220, tier:'old'}, {y:150, tier:'new'}, {y:80, tier:'new'} ];
+  let content = `<line x1="130" y1="60" x2="130" y2="320" stroke="#5c7a3d" stroke-width="5"/>`;
+  levels.forEach(lv=>{
+    const active = highlightOldTier===null ? false : (lv.tier===highlightOldTier);
+    const col = active ? "#b3462c" : "#3d6b46";
+    content += `<ellipse cx="90" cy="${lv.y}" rx="34" ry="14" fill="${col}" fill-opacity="${active?0.85:0.4}" transform="rotate(-20 90 ${lv.y})"/>`;
+    content += `<ellipse cx="170" cy="${lv.y}" rx="34" ry="14" fill="${col}" fill-opacity="${active?0.85:0.4}" transform="rotate(20 170 ${lv.y})"/>`;
+  });
+  content += `<text x="230" y="300" font-size="10" fill="#6b6a5f">old</text>`;
+  content += `<text x="230" y="90" font-size="10" fill="#6b6a5f">new</text>`;
+  svg.innerHTML = content;
+}
+function selectMobility(key, btnEl){
+  document.querySelectorAll('#mobilityButtons button').forEach(b=>{b.style.background="#f0ede2"; b.style.color="var(--ink)";});
+  btnEl.style.background = "var(--accent)"; btnEl.style.color = "#fff";
+  const d = mobilityData[key];
+  const tier = d.mobile ? 'old' : 'new';
+  drawPlant(tier);
+  document.getElementById('mobilityInfo').innerHTML = `<strong>${key} — ${d.mobile ? 'Mobile' : 'Immobile'} nutrient.</strong> Symptoms appear first in <strong>${tier==='old' ? 'older/lower leaves' : 'new growth/growing points'}</strong>.<br><br>${d.symptom}`;
+}
+drawPlant(null);
+
+// ---------- DEFICIENCY THRESHOLD REFERENCE & CHECKER ----------
+const nutrientThresholds = {
+  N:  {soil:{unit:'ppm NO₃-N', deficient:10, suffMin:15, suffMax:40, high:50},  tissue:{unit:'%',   deficient:2.0,  suffMin:2.5, suffMax:4.0, high:4.5}},
+  P:  {soil:{unit:'ppm Olsen-P', deficient:8, suffMin:15, suffMax:30, high:40}, tissue:{unit:'%',   deficient:0.15, suffMin:0.20, suffMax:0.50, high:0.60}},
+  K:  {soil:{unit:'ppm exch. K', deficient:60, suffMin:100, suffMax:200, high:250}, tissue:{unit:'%', deficient:1.0, suffMin:1.5, suffMax:3.0, high:3.5}},
+  Ca: {soil:{unit:'ppm exch. Ca', deficient:400, suffMin:800, suffMax:2000, high:2500}, tissue:{unit:'%', deficient:0.3, suffMin:0.5, suffMax:2.0, high:2.5}},
+  Mg: {soil:{unit:'ppm exch. Mg', deficient:40, suffMin:60, suffMax:150, high:200}, tissue:{unit:'%', deficient:0.15, suffMin:0.25, suffMax:0.60, high:0.80}},
+  S:  {soil:{unit:'ppm SO₄-S', deficient:5, suffMin:8, suffMax:20, high:25}, tissue:{unit:'%', deficient:0.10, suffMin:0.15, suffMax:0.30, high:0.40}},
+  Fe: {soil:{unit:'ppm DTPA-Fe', deficient:2.0, suffMin:2.5, suffMax:10, high:15}, tissue:{unit:'ppm', deficient:40, suffMin:50, suffMax:150, high:200}},
+  Mn: {soil:{unit:'ppm DTPA-Mn', deficient:1.0, suffMin:1.5, suffMax:10, high:15}, tissue:{unit:'ppm', deficient:15, suffMin:20, suffMax:100, high:150}},
+  Zn: {soil:{unit:'ppm DTPA-Zn', deficient:0.5, suffMin:0.8, suffMax:2.5, high:4}, tissue:{unit:'ppm', deficient:15, suffMin:20, suffMax:50, high:70}},
+  Cu: {soil:{unit:'ppm DTPA-Cu', deficient:0.2, suffMin:0.3, suffMax:1.5, high:2.5}, tissue:{unit:'ppm', deficient:4, suffMin:5, suffMax:15, high:20}},
+  B:  {soil:{unit:'ppm hot-water B', deficient:0.3, suffMin:0.5, suffMax:2.0, high:3.0}, tissue:{unit:'ppm', deficient:15, suffMin:20, suffMax:60, high:100}},
+  Mo: {soil:{unit:'ppm avail. Mo', deficient:0.05, suffMin:0.1, suffMax:0.3, high:0.5}, tissue:{unit:'ppm', deficient:0.05, suffMin:0.1, suffMax:1.0, high:2.0}}
+};
+
+function populateThreshNutrientSelect(){
+  const sel = document.getElementById('threshNutrient');
+  sel.innerHTML = Object.keys(nutrientThresholds).map(k=>`<option value="${k}">${k}</option>`).join('');
+}
+populateThreshNutrientSelect();
+
+function classifyThreshold(t, value){
+  if(value < t.deficient) return {label:'Deficient', color:'#b3462c'};
+  if(value < t.suffMin)   return {label:'Low / marginal', color:'#c9a227'};
+  if(value <= t.suffMax)  return {label:'Sufficient', color:'#3d6b46'};
+  if(value <= t.high)     return {label:'High', color:'#7a4fa3'};
+  return {label:'Excessive', color:'#8a5a2b'};
+}
+
+function updateThresholdChecker(){
+  const nutrient = document.getElementById('threshNutrient').value;
+  const testType = document.getElementById('threshTestType').value;
+  const t = nutrientThresholds[nutrient][testType];
+  document.getElementById('threshUnit').textContent = t.unit;
+
+  const valEl = document.getElementById('threshValue');
+  const raw = valEl.value;
+  const resultEl = document.getElementById('threshResult');
+  const barWrap = document.getElementById('threshBarWrap');
+
+  // reference scale bar (deficient / marginal / sufficient / high / excessive)
+  const scaleMax = t.high * 1.4;
+  const pct = v => Math.max(0, Math.min(100, (v/scaleMax)*100));
+  let bar = `<div style="position:relative; height:22px; border-radius:5px; overflow:hidden; background:
+      linear-gradient(to right,
+        #b3462c 0%, #b3462c ${pct(t.deficient)}%,
+        #c9a227 ${pct(t.deficient)}%, #c9a227 ${pct(t.suffMin)}%,
+        #3d6b46 ${pct(t.suffMin)}%, #3d6b46 ${pct(t.suffMax)}%,
+        #7a4fa3 ${pct(t.suffMax)}%, #7a4fa3 ${pct(t.high)}%,
+        #8a5a2b ${pct(t.high)}%, #8a5a2b 100%);">`;
+  if(raw !== ''){
+    const v = parseFloat(raw);
+    bar += `<div style="position:absolute; top:-4px; left:${pct(v)}%; width:2px; height:30px; background:#111;"></div>`;
+  }
+  bar += `</div>
+    <div class="flex-between muted" style="font-size:0.7rem; margin-top:3px;">
+      <span>0</span><span>deficient &lt; ${t.deficient}</span><span>sufficient ${t.suffMin}–${t.suffMax}</span><span>high &gt; ${t.high}</span>
+    </div>`;
+  barWrap.innerHTML = bar;
+
+  if(raw === ''){
+    resultEl.textContent = '—';
+    resultEl.style.color = 'var(--accent)';
+  } else {
+    const v = parseFloat(raw);
+    const cls = classifyThreshold(t, v);
+    resultEl.textContent = cls.label;
+    resultEl.style.color = cls.color;
+  }
+}
+['threshNutrient','threshTestType','threshValue'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', updateThresholdChecker);
+  document.getElementById(id).addEventListener('change', updateThresholdChecker);
+});
+updateThresholdChecker();
+
+// ---------- TAB 6: LAB REPORT ANALYZER & RECOMMENDATIONS ----------
+const deficientRecs = {
+  N:  "apply nitrogen fertilizer (e.g., urea, UAN, ammonium sulfate), split across the season to match crop uptake timing; a pre-sidedress soil nitrate test can confirm the response.",
+  P:  "band-place phosphorus fertilizer near the root zone — broadcast P is inefficient, especially on high-pH/calcareous or acidic Al/Fe-rich soils where P fixes readily.",
+  K:  "apply potassium fertilizer (e.g., potassium chloride or sulfate); avoid over-application, which can induce Mg deficiency through cation competition.",
+  Ca: "if soil pH is also low, agricultural lime addresses both; if pH is already adequate, use gypsum (calcium sulfate), which supplies Ca without raising pH further.",
+  Mg: "use dolomitic lime if pH also needs raising, or magnesium sulfate / foliar Mg if pH is already adequate.",
+  S:  "apply sulfate-based fertilizers (ammonium sulfate, gypsum, or elemental S for slow release) — more common on sandy, low-organic-matter soils.",
+  Fe: "foliar chelated iron (Fe-EDDHA works best on high-pH soils) gives the fastest correction; soil-applied Fe is often ineffective above pH ~7.5 without chelation.",
+  Mn: "foliar manganese sulfate is typically most effective, especially on high-pH soils where soil-applied Mn oxidizes to unavailable forms.",
+  Zn: "soil or foliar zinc sulfate; soil banding works on acid soils, foliar application is more reliable on high-pH/calcareous soils.",
+  Cu: "foliar copper sulfate or chelate; true Cu deficiency is uncommon outside sandy, peaty, or very high-organic-matter soils.",
+  B:  "apply boron cautiously (e.g., Solubor) — the sufficiency window for B is narrow and over-application is phytotoxic.",
+  Mo: "usually corrected by raising soil pH toward neutral rather than direct fertilization, since Mo availability increases with pH; if pH is already adequate, use a molybdate seed treatment or foliar spray."
+};
+
+function statusMessage(nutrient, status){
+  if(status==='Deficient') return `Deficient — ${deficientRecs[nutrient]}`;
+  if(status==='Low / marginal') return `Marginal — monitor closely; a modest version of the same corrective approach used for deficiency is often worthwhile.`;
+  if(status==='Sufficient') return `Sufficient — no corrective action needed.`;
+  if(status==='High') return `High — avoid further additions; watch for antagonistic effects on other nutrients (see the Limiting Factors &amp; Interactions tab).`;
+  return `Excessive — stop applications; check whether this is suppressing an antagonistic nutrient (see the Limiting Factors &amp; Interactions tab) or contributing to salinity/toxicity.`;
+}
+
+function phRecommendation(){
+  const raw = document.getElementById('labPh').value;
+  if(raw === '') return null;
+  const phVal = parseFloat(raw);
+  const crop = cropData[currentCropKey];
+  if(crop){
+    if(phVal < crop.phMin) return `Soil pH (${phVal}) is below ${crop.name}'s optimal range (${crop.phMin}–${crop.phMax}) — consider agricultural lime to raise pH; this also improves Ca, Mg, P, K and N availability and reduces Al/Mn toxicity risk (see the Soil pH &amp; Availability tab).`;
+    if(phVal > crop.phMax) return `Soil pH (${phVal}) is above ${crop.name}'s optimal range (${crop.phMin}–${crop.phMax}) — consider elemental sulfur or an acidifying fertilizer (e.g., ammonium sulfate) to lower pH over time; watch for Fe/Zn/Mn/Cu deficiency risk at this pH (see the Soil pH &amp; Availability tab).`;
+    return `Soil pH (${phVal}) is within ${crop.name}'s optimal range (${crop.phMin}–${crop.phMax}) — no pH correction needed.`;
+  }
+  if(phVal < 6.0) return `Soil pH (${phVal}) is on the acidic side — the broadest nutrient availability window is generally pH 6.0–7.5 (see the Soil pH &amp; Availability tab). Select a crop above for a crop-specific target.`;
+  if(phVal > 7.5) return `Soil pH (${phVal}) is on the alkaline side — micronutrient availability (Fe, Zn, Mn, Cu) typically declines above pH ~7.5 (see the Soil pH &amp; Availability tab). Select a crop above for a crop-specific target.`;
+  return `Soil pH (${phVal}) is within the broadly optimal 6.0–7.5 range for most crops (see the Soil pH &amp; Availability tab).`;
+}
+
+function buildLabInputs(){
+  const grid = document.getElementById('labInputsGrid');
+  const testType = document.getElementById('labTestType').value;
+  let html = '';
+  Object.keys(nutrientThresholds).forEach(k=>{
+    const t = nutrientThresholds[k][testType];
+    const prevVal = document.getElementById('lab_'+k) ? document.getElementById('lab_'+k).value : '';
+    html += `<div><label>${k} (${t.unit})</label><input type="number" step="any" class="labNutrientInput" id="lab_${k}" value="${prevVal}"></div>`;
+  });
+  grid.innerHTML = html;
+  grid.querySelectorAll('.labNutrientInput').forEach(inp=> inp.addEventListener('input', renderLabResults));
+}
+
+function renderLabResults(){
+  const testType = document.getElementById('labTestType').value;
+  const tbl = document.getElementById('labResultsTable');
+  let rows = `<tr><th>Nutrient</th><th>Value</th><th>Status</th></tr>`;
+  const recs = [];
+
+  const phRec = phRecommendation();
+  if(phRec) recs.push(`<div class="callout" style="margin-bottom:8px;"><strong>pH:</strong> ${phRec}</div>`);
+
+  let any = false;
+  Object.keys(nutrientThresholds).forEach(k=>{
+    const inp = document.getElementById('lab_'+k);
+    const raw = inp ? inp.value : '';
+    if(raw === '') return;
+    any = true;
+    const v = parseFloat(raw);
+    const t = nutrientThresholds[k][testType];
+    const cls = classifyThreshold(t, v);
+    rows += `<tr><td>${k}</td><td>${v} ${t.unit}</td><td style="color:${cls.color}; font-weight:700;">${cls.label}</td></tr>`;
+    recs.push(`<div class="callout" style="border-left-color:${cls.color}; margin-bottom:8px;"><strong>${k}:</strong> ${statusMessage(k, cls.label)}</div>`);
+  });
+  tbl.innerHTML = rows;
+
+  const recDiv = document.getElementById('labRecommendations');
+  if(!any && !phRec){
+    recDiv.innerHTML = `<p class="muted">Enter a pH value and/or at least one nutrient value above to generate recommendations.</p>`;
+  } else {
+    recDiv.innerHTML = recs.join('');
+  }
+}
+
+document.getElementById('labTestType').addEventListener('change', ()=>{ buildLabInputs(); renderLabResults(); });
+document.getElementById('labPh').addEventListener('input', renderLabResults);
+buildLabInputs();
+renderLabResults();
+
+// ---------- TAB 5: LIEBIG'S LAW OF THE MINIMUM ----------
+const liebigNutrients = [
+  {key:'N', color:'#2f6b3c', val:80},
+  {key:'P', color:'#c9a227', val:55},
+  {key:'K', color:'#7a4fa3', val:90},
+  {key:'S', color:'#e0a13b', val:75},
+  {key:'Ca',color:'#4a90d9', val:85},
+  {key:'Mg',color:'#57a0a8', val:70}
+];
+const liebigWrap = document.getElementById('liebigSliders');
+liebigNutrients.forEach(n=>{
+  const row = document.createElement('div');
+  row.innerHTML = `<div class="flex-between"><label style="margin-bottom:2px;">${n.key} supply: <span class="slider-value" id="liebigVal_${n.key}">${n.val}%</span></label></div>
+    <input type="range" min="0" max="100" step="1" value="${n.val}" id="liebigSlider_${n.key}">`;
+  liebigWrap.appendChild(row);
+  row.querySelector('input').addEventListener('input', updateLiebig);
+});
+function updateLiebig(){
+  liebigNutrients.forEach(n=>{
+    n.val = parseFloat(document.getElementById('liebigSlider_'+n.key).value);
+    document.getElementById('liebigVal_'+n.key).textContent = n.val+'%';
+  });
+  const minEntry = liebigNutrients.reduce((a,b)=> a.val<=b.val ? a : b);
+  document.getElementById('limitingNutrient').textContent = minEntry.key;
+  document.getElementById('limitingYield').textContent = minEntry.val+'%';
+
+  // draw barrel
+  const svg = document.getElementById('barrelSvg');
+  const baseY = 240, maxH = 180, staveW = 34, gap = 8, startX = 20;
+  let content = '';
+  liebigNutrients.forEach((n,i)=>{
+    const x = startX + i*(staveW+gap);
+    const h = (n.val/100)*maxH;
+    content += `<rect x="${x}" y="${baseY-h}" width="${staveW}" height="${h}" fill="${n.color}" fill-opacity="0.85" rx="3"/>`;
+    content += `<text x="${x+staveW/2}" y="${baseY+16}" font-size="11" fill="#2b2a25" text-anchor="middle">${n.key}</text>`;
+  });
+  const waterH = (minEntry.val/100)*maxH;
+  const barrelW = liebigNutrients.length*(staveW+gap)-gap;
+  content += `<rect x="${startX-6}" y="${baseY-waterH}" width="${barrelW+12}" height="${waterH}" fill="#4a90d9" fill-opacity="0.35"/>`;
+  content += `<line x1="${startX-6}" y1="${baseY-waterH}" x2="${startX+barrelW+6}" y2="${baseY-waterH}" stroke="#1c5f8a" stroke-width="2" stroke-dasharray="3,2"/>`;
+  content += `<text x="${startX-6}" y="${baseY-waterH-6}" font-size="10" fill="#1c5f8a">water/yield line</text>`;
+  svg.innerHTML = content;
+}
+updateLiebig();
+
+// ---------- TAB 7: NUTRIENT INTERACTIONS ----------
+const interactionData = {
+  K:     "Excess K competes with Mg²⁺ and Ca²⁺ for root uptake sites, commonly inducing Mg deficiency ('luxury K uptake') — a frequent issue with heavy potash fertilization.",
+  P:     "Excess P can precipitate Zn and Fe into unavailable forms and suppress their uptake, inducing Zn deficiency even when soil Zn is adequate — common in high-P fertilized soils.",
+  Ca:    "Excess Ca competes with Mg and K for exchange sites and uptake, and can also reduce B availability — a concern on over-limed or naturally calcareous soils.",
+  N_NH4: "Excess NH₄⁺ competes directly with K⁺, Ca²⁺, and Mg²⁺ for root uptake carriers, and acidifies the rhizosphere, which can further shift micronutrient availability at the root surface.",
+  Na:    "Excess Na (salinity/sodicity) competes with K⁺ and Ca²⁺ for uptake and disrupts membrane selectivity, while high osmotic potential reduces overall water and nutrient uptake."
+};
+document.getElementById('interactSelect').addEventListener('change', updateInteraction);
+function updateInteraction(){
+  const key = document.getElementById('interactSelect').value;
+  document.getElementById('interactionResult').innerHTML = interactionData[key];
+}
+updateInteraction();
+
+// ---------- TAB 8: CEC & BASE SATURATION ----------
+function updateCEC(){
+  const clay = parseFloat(document.getElementById('claySlider').value);
+  const som = parseFloat(document.getElementById('somCecSlider').value);
+  document.getElementById('clayLabel').textContent = clay+'%';
+  document.getElementById('somCecLabel').textContent = som.toFixed(1)+'%';
+  const cec = clay*0.7 + som*2.0;
+  document.getElementById('cecOut').textContent = cec.toFixed(1);
+}
+document.getElementById('claySlider').addEventListener('input', updateCEC);
+document.getElementById('somCecSlider').addEventListener('input', updateCEC);
+updateCEC();
+
+function buildBaseSatChart(){
+  const segs = [
+    {name:'Ca²⁺', pct:70, color:'#4a90d9'},
+    {name:'Mg²⁺', pct:10, color:'#57a0a8'},
+    {name:'K⁺',   pct:4,  color:'#7a4fa3'},
+    {name:'H⁺/Al³⁺ (acidity)', pct:16, color:'#b3462c'}
+  ];
+  const wrap = document.getElementById('baseSatChart');
+  let bar = `<div style="display:flex; width:100%; height:26px; border-radius:6px; overflow:hidden;">`;
+  segs.forEach(s=> bar += `<div style="width:${s.pct}%; background:${s.color};" title="${s.name}: ${s.pct}%"></div>`);
+  bar += `</div>`;
+  let legend = `<div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:8px;">`;
+  segs.forEach(s=> legend += `<div class="legend-row"><span class="swatch" style="background:${s.color}"></span>${s.name}: ${s.pct}%</div>`);
+  legend += `</div>`;
+  wrap.innerHTML = bar + legend + `<p class="muted" style="margin-top:6px;">Reference distribution for a well-limed, near-neutral mineral soil — actual values vary by soil and management.</p>`;
+}
+buildBaseSatChart();
+
+// ---------- CROP-SPECIFIC MODELS ----------
+cropData = {
+  tomato: {
+    name: "Tomato", phMin:6.0, phMax:6.8, residueCN:25, residueLabel:"vine/foliage residue",
+    yieldBasis:"≈80–100 t/ha processing tomato", uptake:{N:250,P2O5:90,K2O:350,S:30,Ca:150,Mg:45}, peakStage:"Peak N &amp; K demand during fruit set through fruit fill; Ca demand is highest during early fruit expansion (the blossom-end rot risk window).",
+    deficiencyNote:"Highly prone to blossom-end rot, driven by localized Ca supply/transport issues (often water-stress related, not just soil Ca); heavy K fertilization can induce Mg deficiency.",
+    demand:{N:70,P:55,K:95,S:60,Ca:85,Mg:65}
+  },
+  corn: {
+    name: "Corn / Maize", phMin:5.8, phMax:7.0, residueCN:80, residueLabel:"stover",
+    yieldBasis:"≈12 t/ha grain + stover", uptake:{N:250,P2O5:100,K2O:200,S:25,Ca:40,Mg:45}, peakStage:"Peak N demand from V6 through tasseling (rapid vegetative growth); K uptake also peaks before tasseling and stays largely in the stover.",
+    deficiencyNote:"Very high overall N demand; Zn deficiency is common on eroded or high-pH soils, showing as interveinal striping in new leaves.",
+    demand:{N:95,P:60,K:75,S:55,Ca:50,Mg:55}
+  },
+  wheat: {
+    name: "Wheat", phMin:6.0, phMax:7.0, residueCN:80, residueLabel:"cereal straw",
+    yieldBasis:"≈8 t/ha grain + straw", uptake:{N:180,P2O5:70,K2O:150,S:20,Ca:25,Mg:20}, peakStage:"Peak N demand at stem elongation through booting; P demand is highest early for root and tiller establishment.",
+    deficiencyNote:"Manganese deficiency common on high-pH, high-organic-matter soils; copper deficiency on sandy or peaty soils.",
+    demand:{N:85,P:55,K:60,S:50,Ca:45,Mg:45}
+  },
+  rice: {
+    name: "Rice (paddy)", phMin:5.5, phMax:6.5, residueCN:70, residueLabel:"straw",
+    yieldBasis:"≈8 t/ha grain + straw", uptake:{N:150,P2O5:60,K2O:150,S:15,Ca:20,Mg:25}, peakStage:"Peak N demand at tillering through panicle initiation; K uptake continues through grain filling.",
+    deficiencyNote:"Zinc deficiency is very common in flooded, high-pH/calcareous paddy soils; Fe is typically abundant to excessive under reducing (flooded) conditions.",
+    demand:{N:90,P:55,K:65,S:45,Ca:40,Mg:40}
+  },
+  potato: {
+    name: "Potato", phMin:5.0, phMax:6.5, residueCN:30, residueLabel:"vine residue",
+    yieldBasis:"≈50 t/ha tubers", uptake:{N:180,P2O5:70,K2O:280,S:20,Ca:15,Mg:20}, peakStage:"Peak K demand during tuber bulking; N demand is front-loaded in vegetative growth, then tapers to avoid delaying maturity.",
+    deficiencyNote:"Very high K demand for tuber bulking; Ca deficiency can cause internal tuber disorders even with adequate soil Ca if uptake is uneven.",
+    demand:{N:65,P:55,K:95,S:50,Ca:55,Mg:50}
+  },
+  alfalfa: {
+    name: "Alfalfa", phMin:6.5, phMax:7.5, residueCN:13, residueLabel:"legume residue",
+    yieldBasis:"≈18 t/ha hay across multiple cuttings per season", uptake:{N:500,P2O5:110,K2O:450,S:40,Ca:180,Mg:50}, peakStage:"K removal is very high per cutting — replenishment between cuttings is critical; most of the N total comes from symbiotic fixation rather than soil or fertilizer N.",
+    deficiencyNote:"Highly sensitive to acidity — poor nodulation and Ca/Mo deficiency below pH ~6.2; boron deficiency causes 'yellow top'. N-fixing, so external N demand is low despite high total N uptake.",
+    demand:{N:20,P:60,K:80,S:55,Ca:90,Mg:65}
+  },
+  grape: {
+    name: "Grape (Vitis)", phMin:5.5, phMax:6.5, residueCN:40, residueLabel:"prunings/cover-crop residue",
+    yieldBasis:"≈15 t/ha fruit", uptake:{N:60,P2O5:20,K2O:90,S:10,Ca:40,Mg:15}, peakStage:"Peak K demand during berry veraison through ripening; N demand is highest at bloom and early shoot growth.",
+    deficiencyNote:"K and Mg often compete — heavy K fertilization can trigger Mg deficiency (vine leaf reddening); boron deficiency affects fruit set.",
+    demand:{N:55,P:50,K:90,S:45,Ca:60,Mg:60}
+  },
+  almond: {
+    name: "Almond (tree nut)", phMin:6.0, phMax:7.0, residueCN:50, residueLabel:"prunings/hulls",
+    yieldBasis:"≈3 t/ha kernel (incl. hulls/shells)", uptake:{N:200,P2O5:40,K2O:220,S:20,Ca:90,Mg:40}, peakStage:"Peak K demand during kernel fill (roughly May–July, N. Hemisphere); N demand is highest during spring shoot and leaf growth.",
+    deficiencyNote:"Zinc and boron deficiencies are widespread in orchard soils; K demand is very high during kernel fill.",
+    demand:{N:75,P:50,K:90,S:50,Ca:55,Mg:50}
+  },
+  citrus: {
+    name: "Citrus", phMin:6.0, phMax:7.5, residueCN:45, residueLabel:"leaf litter/prunings",
+    yieldBasis:"≈40 t/ha fruit", uptake:{N:180,P2O5:40,K2O:200,S:20,Ca:90,Mg:30}, peakStage:"Peak N &amp; K demand during fruit set through fruit sizing; Ca/Mg uptake is continuous but sensitive to competitive over-application of K.",
+    deficiencyNote:"Classic lime-induced chlorosis (Fe, Zn, Mn) on high-pH/calcareous soils; K is needed for fruit size and juice quality.",
+    demand:{N:70,P:50,K:80,S:45,Ca:55,Mg:55}
+  },
+  lettuce: {
+    name: "Lettuce", phMin:6.0, phMax:6.8, residueCN:18, residueLabel:"leafy residue",
+    yieldBasis:"≈40 t/ha fresh weight", uptake:{N:150,P2O5:50,K2O:200,S:20,Ca:60,Mg:20}, peakStage:"Rapid uptake of all nutrients during head formation — the short crop cycle concentrates demand into just a few weeks.",
+    deficiencyNote:"Prone to tipburn from localized Ca deficiency in rapidly expanding leaf tissue — usually a transport/humidity issue rather than a soil-supply shortfall.",
+    demand:{N:70,P:50,K:70,S:45,Ca:70,Mg:45}
+  },
+  blueberry: {
+    name: "Blueberry", phMin:4.5, phMax:5.5, residueCN:50, residueLabel:"woody/leaf litter",
+    yieldBasis:"≈12 t/ha fruit", uptake:{N:70,P2O5:15,K2O:50,S:10,Ca:15,Mg:10}, peakStage:"Peak N &amp; K demand during fruit development post-bloom; overall nutrient demand is low relative to other fruit crops, consistent with its acid-soil, low-fertility native habitat.",
+    deficiencyNote:"Iron chlorosis becomes the dominant problem above pH ~5.5–6.0 — this ericaceous crop is the clearest illustration of why optimal pH is crop-specific rather than universal.",
+    demand:{N:50,P:40,K:55,S:40,Ca:35,Mg:45}
+  },
+  soybean: {
+    name: "Soybean", phMin:6.0, phMax:6.8, residueCN:20, residueLabel:"stubble/pods",
+    yieldBasis:"≈3.5 t/ha grain + stubble", uptake:{N:280,P2O5:70,K2O:120,S:20,Ca:60,Mg:35}, peakStage:"Peak nutrient uptake during pod fill; most N need is met by symbiotic fixation, but P and K removal in the grain itself is high.",
+    deficiencyNote:"Sensitive to Mn deficiency and Fe chlorosis on high-pH/calcareous soils; poor nodulation and N fixation below pH ~6.0.",
+    demand:{N:30,P:65,K:80,S:50,Ca:55,Mg:50}
+  },
+  cotton: {
+    name: "Cotton", phMin:5.8, phMax:7.0, residueCN:60, residueLabel:"stalks",
+    yieldBasis:"≈1,500 kg/ha lint+seed, plus stalks", uptake:{N:180,P2O5:60,K2O:180,S:20,Ca:60,Mg:30}, peakStage:"Peak K demand during boll fill — K shortage here ('cutout') directly reduces fiber quality; N demand peaks earlier at squaring/flowering.",
+    deficiencyNote:"K deficiency during boll fill is a major yield/fiber-quality limiter in high-yielding cotton; boron deficiency reduces boll set.",
+    demand:{N:75,P:55,K:90,S:50,Ca:55,Mg:45}
+  },
+  barley: {
+    name: "Barley", phMin:6.0, phMax:7.5, residueCN:70, residueLabel:"straw",
+    yieldBasis:"≈6 t/ha grain + straw", uptake:{N:140,P2O5:55,K2O:120,S:18,Ca:20,Mg:18}, peakStage:"Peak N demand at tillering through stem elongation.",
+    deficiencyNote:"Notably sensitive to soil acidity and Al toxicity — more so than wheat; manganese deficiency on high-pH peaty/sandy soils causes 'grey speck' disease.",
+    demand:{N:80,P:55,K:60,S:45,Ca:40,Mg:40}
+  },
+  sunflower: {
+    name: "Sunflower", phMin:6.0, phMax:7.5, residueCN:50, residueLabel:"stalks/heads",
+    yieldBasis:"≈2.5 t/ha seed + stalks", uptake:{N:130,P2O5:55,K2O:220,S:20,Ca:70,Mg:35}, peakStage:"Peak K and B demand during head fill; boron deficiency causes hollow stem and poor seed set.",
+    deficiencyNote:"High K removal in seed; boron deficiency is a well-known yield limiter in this crop, causing hollow stem and reduced seed set.",
+    demand:{N:65,P:55,K:90,S:50,Ca:60,Mg:50}
+  },
+  onion: {
+    name: "Onion", phMin:6.0, phMax:6.8, residueCN:15, residueLabel:"tops/culls",
+    yieldBasis:"≈45 t/ha bulbs", uptake:{N:120,P2O5:45,K2O:150,S:35,Ca:60,Mg:20}, peakStage:"Peak N and K demand during bulb bulking; sulfur demand is notably high — it's needed for the compounds behind onion flavor and pungency.",
+    deficiencyNote:"Shallow, sparse root system makes onions highly responsive to P and S availability; S deficiency reduces pungency/flavor compound synthesis.",
+    demand:{N:65,P:60,K:75,S:70,Ca:55,Mg:40}
+  },
+  strawberry: {
+    name: "Strawberry", phMin:5.5, phMax:6.5, residueCN:25, residueLabel:"foliage/runners",
+    yieldBasis:"≈40 t/ha fruit", uptake:{N:150,P2O5:40,K2O:180,S:20,Ca:80,Mg:25}, peakStage:"Peak K demand during fruit development/ripening; Ca uptake is critical throughout for fruit firmness and shelf life.",
+    deficiencyNote:"Ca deficiency reduces fruit firmness and increases tip-burn/disorders; sensitive to Fe chlorosis on high-pH soils.",
+    demand:{N:65,P:50,K:85,S:50,Ca:75,Mg:45}
+  },
+  avocado: {
+    name: "Avocado", phMin:6.0, phMax:6.5, residueCN:60, residueLabel:"prunings/leaf litter",
+    yieldBasis:"≈12 t/ha fruit", uptake:{N:150,P2O5:30,K2O:200,S:20,Ca:70,Mg:30}, peakStage:"Peak N demand during spring flush/flowering; K demand highest during fruit sizing.",
+    deficiencyNote:"Highly sensitive to salinity and chloride toxicity (leaf tip burn); zinc deficiency is common; over-application of N can worsen alternate bearing.",
+    demand:{N:70,P:45,K:85,S:45,Ca:60,Mg:50}
+  },
+  walnut: {
+    name: "Walnut", phMin:6.0, phMax:7.0, residueCN:55, residueLabel:"prunings/hulls",
+    yieldBasis:"≈4 t/ha in-shell nuts", uptake:{N:200,P2O5:40,K2O:180,S:20,Ca:70,Mg:35}, peakStage:"Peak N demand during spring shoot growth and nut set; K demand highest during kernel fill (Aug–Sep, N. Hemisphere).",
+    deficiencyNote:"Zinc deficiency is common (little-leaf/rosetting); susceptible to K-deficiency leaf-margin scorch in heavy crop years.",
+    demand:{N:80,P:50,K:90,S:50,Ca:55,Mg:50}
+  },
+  pistachio: {
+    name: "Pistachio", phMin:7.0, phMax:8.0, residueCN:55, residueLabel:"prunings/hulls",
+    yieldBasis:"≈2.5 t/ha nuts", uptake:{N:180,P2O5:30,K2O:200,S:20,Ca:60,Mg:30}, peakStage:"Peak N &amp; K demand during kernel fill (Jul–Aug).",
+    deficiencyNote:"Unusually tolerant of high pH and moderate salinity compared to other tree nuts, thanks to alkaline-adapted rootstocks; K deficiency shows as marginal leaf scorch.",
+    demand:{N:75,P:45,K:90,S:45,Ca:55,Mg:50}
+  },
+  olive: {
+    name: "Olive", phMin:6.5, phMax:8.0, residueCN:40, residueLabel:"prunings/leaves",
+    yieldBasis:"≈8 t/ha fruit (oil olives)", uptake:{N:120,P2O5:25,K2O:150,S:15,Ca:50,Mg:20}, peakStage:"Peak N demand at flowering/fruit set; K uptake is critical during oil accumulation in fall.",
+    deficiencyNote:"Boron deficiency causes poor fruit set ('June drop'-type losses); otherwise a low-demand, wide-pH-tolerant, drought- and salinity-tolerant crop.",
+    demand:{N:55,P:40,K:75,S:40,Ca:50,Mg:40}
+  }
+};
+
+function populateCropSelect(){
+  const sel = document.getElementById('cropSelect');
+  let opts = `<option value="">General / all-crop defaults</option>`;
+  Object.keys(cropData).forEach(k=> opts += `<option value="${k}">${cropData[k].name}</option>`);
+  sel.innerHTML = opts;
+}
+populateCropSelect();
+
+// ---------- TAB 5: CROP NUTRIENT NEEDS ----------
+function computeGlobalMaxUptake(){
+  let max = 0;
+  Object.values(cropData).forEach(c=>{
+    Object.values(c.uptake).forEach(v=>{ if(v>max) max=v; });
+  });
+  return max;
+}
+function buildCropNeedsTable(){
+  const tbl = document.getElementById('cropNeedsTable');
+  let rows = `<tr><th>Crop</th><th>N</th><th>P₂O₅</th><th>K₂O</th><th>S</th><th>Ca</th><th>Mg</th><th>Yield basis</th></tr>`;
+  Object.keys(cropData).forEach(k=>{
+    const c = cropData[k];
+    const hl = (k===currentCropKey) ? ' style="background:#eef4e9;"' : '';
+    rows += `<tr${hl}><td>${c.name}</td><td>${c.uptake.N}</td><td>${c.uptake.P2O5}</td><td>${c.uptake.K2O}</td><td>${c.uptake.S}</td><td>${c.uptake.Ca}</td><td>${c.uptake.Mg}</td><td>${c.yieldBasis}</td></tr>`;
+  });
+  tbl.innerHTML = rows;
+}
+function updateCropNeedsDetail(){
+  const crop = cropData[currentCropKey];
+  const detail = document.getElementById('cropNeedsDetail');
+  const placeholder = document.getElementById('cropNeedsPlaceholder');
+  if(!crop){
+    detail.style.display = 'none';
+    placeholder.style.display = 'block';
+    return;
+  }
+  placeholder.style.display = 'none';
+  detail.style.display = 'block';
+  document.getElementById('cropNeedsDetailTitle').textContent = `${crop.name} — total nutrient uptake (${crop.yieldBasis})`;
+  const maxV = computeGlobalMaxUptake();
+  const nutrientLabels = [['N','N'],['P2O5','P₂O₅'],['K2O','K₂O'],['S','S'],['Ca','Ca'],['Mg','Mg']];
+  const colors = {N:'#2f6b3c',P2O5:'#c9a227',K2O:'#7a4fa3',S:'#e0a13b',Ca:'#4a90d9',Mg:'#57a0a8'};
+  let bars = '';
+  nutrientLabels.forEach(([key,label])=>{
+    const v = crop.uptake[key];
+    const pct = (v/maxV*100).toFixed(1);
+    bars += `<div style="margin-bottom:8px;">
+      <div class="flex-between" style="font-size:0.8rem;"><span>${label}</span><span>${v} kg/ha</span></div>
+      <div style="background:#f0ede2; border-radius:5px; height:16px; overflow:hidden;">
+        <div style="width:${pct}%; height:100%; background:${colors[key]};"></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('cropNeedsBars').innerHTML = bars;
+  document.getElementById('cropNeedsStageNote').innerHTML = `<strong>Peak demand timing:</strong> ${crop.peakStage}`;
+}
+buildCropNeedsTable();
+updateCropNeedsDetail();
+
+function applyCrop(key){
+  currentCropKey = key;
+  const crop = cropData[key];
+  const tag = document.getElementById('cropTag');
+  const phNote = document.getElementById('cropPhNote');
+  const resNote = document.getElementById('cropResidueNote');
+  const defNote = document.getElementById('cropDeficiencyNote');
+  const demNote = document.getElementById('cropDemandNote');
+
+  buildCropNeedsTable();
+  updateCropNeedsDetail();
+  if(typeof renderLabResults === 'function') renderLabResults();
+
+  if(!crop){
+    tag.textContent = 'General / all-crop defaults';
+    [phNote, resNote, defNote, demNote].forEach(el=> el.style.display='none');
+    updateCropBand();
+    return;
+  }
+
+  tag.textContent = `${crop.name} — optimal pH ${crop.phMin}–${crop.phMax}`;
+  updateCropBand();
+
+  phNote.style.display = 'block';
+  phNote.innerHTML = `<strong>${crop.name}</strong> optimal pH range: <strong>${crop.phMin}–${crop.phMax}</strong>. ${crop.deficiencyNote}`;
+
+  resNote.style.display = 'block';
+  resNote.innerHTML = `<strong>${crop.name} residue</strong> (${crop.residueLabel}) runs around <strong>${crop.residueCN}:1</strong> C:N — ${crop.residueCN<24 ? 'narrow enough to mineralize N fairly quickly after incorporation.' : 'wide enough to cause temporary N immobilization if incorporated fresh, without added N.'}`;
+
+  defNote.style.display = 'block';
+  defNote.innerHTML = `<strong>${crop.name} — common deficiency pattern:</strong> ${crop.deficiencyNote}`;
+
+  demNote.style.display = 'block';
+  demNote.innerHTML = `Applied <strong>${crop.name}</strong>'s typical relative nutrient demand to the sliders below (illustrative teaching values, not a fertilizer recommendation).`;
+  Object.keys(crop.demand).forEach(k=>{
+    const slider = document.getElementById('liebigSlider_'+k);
+    if(slider) slider.value = crop.demand[k];
+  });
+  updateLiebig();
+}
+document.getElementById('cropSelect').addEventListener('change', e=> applyCrop(e.target.value));
+</script>
+
+</body>
+</html>
