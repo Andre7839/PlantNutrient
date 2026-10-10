@@ -17,9 +17,59 @@
   header{
     background:linear-gradient(120deg,#2f4d33,#3d6b46 60%,#5c8a56);
     color:#f4f1e6; padding:22px 28px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
   }
   header h1{margin:0 0 4px 0; font-size:1.45rem; font-weight:600;}
-  header p{margin:0; font-size:0.85rem; opacity:0.85;}
+  header p{margin:0; font-size:0.85rem; opacity:0.85; color:#f4f1e6;}
+
+  .learn-btn{
+    background:#f4f1e6; color:#2f4d33; border:none; border-radius:22px; padding:10px 20px;
+    font-size:0.95rem; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.25);
+  }
+  .learn-btn:hover{background:#ffffff;}
+  .learn-panel{
+    display:none; position:fixed; top:0; right:0; bottom:0; width:400px; max-width:100vw;
+    background:var(--panel); border-left:1px solid var(--line); box-shadow:-6px 0 24px rgba(0,0,0,0.25);
+    z-index:1100; flex-direction:column;
+  }
+  .learn-panel.open{display:flex;}
+  .learn-head{display:flex; align-items:center; gap:8px; padding:12px 16px; background:#2f4d33; color:#f4f1e6;}
+  .learn-head h2{margin:0; font-size:1.02rem; color:#f4f1e6; flex:0 0 auto;}
+  .learn-meta{flex:1; font-size:0.75rem; opacity:0.85; text-align:right;}
+  .learn-iconbtn{background:none; border:none; color:#f4f1e6; font-size:1.1rem; cursor:pointer; padding:2px 8px; border-radius:4px;}
+  .learn-iconbtn:hover{background:rgba(255,255,255,0.18);}
+  .learn-body{padding:16px 18px 22px; overflow-y:auto; flex:1;}
+  .learn-panel.min{top:auto; bottom:16px; right:16px; width:340px; border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  .learn-panel.min .learn-body{display:none;}
+  body.learn-open:not(.learn-min){padding-right:400px;}
+  @media (max-width: 960px){
+    .learn-panel{top:auto; left:0; width:auto; height:48vh; border-left:none; border-top:1px solid var(--line); box-shadow:0 -6px 24px rgba(0,0,0,0.25);}
+    .learn-panel.min{left:auto; right:12px; bottom:12px; height:auto; width:min(340px, calc(100vw - 24px));}
+    body.learn-open:not(.learn-min){padding-right:0; padding-bottom:48vh;}
+  }
+  .learn-progress{height:6px; background:#e2ddd0; border-radius:4px; overflow:hidden; margin:6px 0 14px;}
+  .learn-progress div{height:100%; background:var(--accent); transition:width .25s;}
+  .learn-tag{display:inline-block; font-size:0.72rem; font-weight:700; color:var(--accent2); background:#f0ede2; padding:2px 10px; border-radius:10px;}
+  .learn-q{font-size:1.02rem; font-weight:600; margin:10px 0 12px; line-height:1.45;}
+  .learn-opt{
+    display:block; width:100%; text-align:left; padding:10px 14px; margin-bottom:8px;
+    background:#fff; border:1.5px solid var(--line); border-radius:8px; font-size:0.92rem; cursor:pointer; color:var(--ink);
+  }
+  .learn-opt:hover:not(:disabled){border-color:var(--accent); background:#f6faf3;}
+  .learn-opt:disabled{cursor:default;}
+  .learn-opt.correct{border-color:#3d6b46; background:#e6f2e0; font-weight:700;}
+  .learn-opt.wrong{border-color:#b3462c; background:#fbece6;}
+  .learn-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
+  .learn-primary, .learn-secondary{
+    padding:9px 18px; border-radius:7px; font-weight:700; font-size:0.88rem; cursor:pointer;
+  }
+  .learn-primary{background:var(--accent); color:#fff; border:1px solid var(--accent);}
+  .learn-secondary{background:#eef4e9; color:var(--accent); border:1px solid var(--accent);}
+  .learn-back{
+    display:none; position:fixed; right:18px; bottom:18px; z-index:900; background:var(--accent); color:#fff;
+    border:none; border-radius:24px; padding:11px 20px; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,0.35);
+  }
+  .learn-missed{border-top:1px solid var(--line); padding:10px 0; font-size:0.88rem;}
   nav{
     display:flex; gap:6px; background:#efe9d8; padding:8px 20px;
     border-bottom:1px solid var(--line); flex-wrap:wrap;
@@ -91,21 +141,25 @@
 <body>
 
 <header>
-  <h1>Soil Chemistry &amp; Plant Nutrition</h1>
-  <p style="margin:0 0 4px 0; font-weight:700; color:#ffffff; opacity:0.95;">Educational tool only</p>
-  <p>An interactive teaching tool — UC Davis Advanced Irrigation Lab</p>
+  <div>
+    <h1>Soil Chemistry &amp; Plant Nutrition</h1>
+    <p style="margin:0 0 4px 0; font-weight:700; color:#ffffff; opacity:0.95;">Educational tool only</p>
+    <p>An interactive teaching tool — UC Davis Advanced Irrigation Lab</p>
+  </div>
+  <button id="learnBtn" class="learn-btn" aria-haspopup="dialog">🎓 Learn</button>
 </header>
 
 <nav>
   <button class="tab-btn active" data-tab="roles">1. Nutrient Roles &amp; Mobility</button>
   <button class="tab-btn" data-tab="ph">2. Soil pH &amp; Availability</button>
-  <button class="tab-btn" data-tab="organic">3. Organic Matter &amp; CEC</button>
-  <button class="tab-btn" data-tab="limiting">4. Limiting Factors &amp; Interactions</button>
+  <button class="tab-btn" data-tab="redox">3. Soil Redox (Eh)</button>
+  <button class="tab-btn" data-tab="organic">4. Organic Matter &amp; CEC</button>
+  <button class="tab-btn" data-tab="limiting">5. Limiting Factors &amp; Interactions</button>
 </nav>
 <nav>
-  <button class="tab-btn" data-tab="thresholds">5. Deficiency Thresholds</button>
-  <button class="tab-btn" data-tab="cropneeds">6. Crop-Specific Profiles</button>
-  <button class="tab-btn" data-tab="labreport">7. Lab Report &amp; Recommendations</button>
+  <button class="tab-btn" data-tab="thresholds">6. Deficiency Thresholds</button>
+  <button class="tab-btn" data-tab="cropneeds">7. Crop-Specific Profiles</button>
+  <button class="tab-btn" data-tab="labreport">8. Lab Report &amp; Recommendations</button>
 </nav>
 
 <div class="crop-bar">
@@ -236,7 +290,83 @@
 
 </section>
 
-<!-- ===================== TAB 3: ORGANIC MATTER, CARBON & CEC ===================== -->
+<!-- ===================== TAB 3: SOIL REDOX (Eh) ===================== -->
+<section id="redox">
+
+  <h2>Soil Redox Potential (Eh)</h2>
+
+  <div class="row">
+    <div class="col">
+      <label>Soil condition (quick presets)</label>
+      <select id="ehPreset">
+        <option value="custom">Custom (use slider)</option>
+        <option value="500">Well-drained upland soil (≈ +500 mV)</option>
+        <option value="400">Moist soil at field capacity (≈ +400 mV)</option>
+        <option value="280">Poorly drained, O₂ running out (≈ +280 mV)</option>
+        <option value="50">Waterlogged soil (≈ +50 mV)</option>
+        <option value="-100">Flooded paddy soil (≈ −100 mV)</option>
+        <option value="-280">Strongly reduced, long-flooded (≈ −280 mV)</option>
+      </select>
+
+      <label style="margin-top:12px;">Measured Eh (mV)</label>
+      <input type="range" id="ehSlider" min="-350" max="750" step="5" value="450">
+      <div class="flex-between muted"><span>−350</span><span class="slider-value" id="ehLabel">+450 mV</span><span>+750</span></div>
+
+      <label style="margin-top:12px;">Soil pH (Eh falls about 59 mV per pH unit)</label>
+      <input type="range" id="ehPhSlider" min="4" max="9" step="0.1" value="6.5">
+      <div class="flex-between muted"><span>4.0</span><span class="slider-value" id="ehPhLabel">6.5</span><span>9.0</span></div>
+    </div>
+
+    <div class="col">
+      <div class="result-box">
+        <div><div class="small-cap">Eh at pH 7 (Eh₇)</div><div class="big-num" id="eh7Out">—</div><div class="muted">mV</div></div>
+        <div><div class="small-cap">Electron activity (pe)</div><div class="big-num" id="peOut">—</div></div>
+      </div>
+      <div class="callout" id="ehZoneBox">—</div>
+      <p class="muted" style="margin-top:8px;">Eh₇ = Eh + 59 × (pH − 7), at 25 °C. Comparing soils at the same pH requires Eh₇.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:26px;">Redox Ladder at This pH</h3>
+  <div class="chart-wrap">
+    <svg id="ehLadderSvg" width="840" height="450" viewBox="0 0 840 450"></svg>
+  </div>
+  <p class="muted">As O₂ runs out, microbes use the next best electron acceptor in a fixed order. Threshold values are typical literature figures at pH 7 and shift down about 59 mV per pH unit; real soils vary with organic carbon, temperature and mineralogy.</p>
+
+  <h3 style="margin-top:26px;">Nutrient Status at This Eh</h3>
+  <div class="chart-wrap">
+    <table id="ehNutrientTable">
+      <tr><th>Element</th><th>Switches at Eh₇ below</th><th>Status</th><th>What it means for plants</th></tr>
+    </table>
+  </div>
+  <div class="callout" id="cropEhNote" style="display:none;"></div>
+
+  <h3 style="margin-top:26px;">Convert a Field Electrode Reading to Eh</h3>
+  <p class="muted">Platinum electrode readings are taken against a reference electrode. Eh = reading + reference potential (25 °C).</p>
+  <div class="row">
+    <div class="col">
+      <label>Reference electrode</label>
+      <select id="ehRefSelect">
+        <option value="199" selected>Ag/AgCl, saturated KCl (+199 mV)</option>
+        <option value="210">Ag/AgCl, 3 M KCl (+210 mV)</option>
+        <option value="244">Saturated calomel, SCE (+244 mV)</option>
+      </select>
+    </div>
+    <div class="col">
+      <label>Meter reading (mV)</label>
+      <input type="number" id="ehReadingInput" step="1" value="150">
+    </div>
+    <div class="col">
+      <div class="result-box" style="margin-top:0;">
+        <div><div class="small-cap">Eh (vs. SHE)</div><div class="big-num" id="ehConvOut">—</div><div class="muted">mV</div></div>
+      </div>
+      <button id="ehUseBtn" style="margin-top:8px; padding:7px 14px; border:1px solid var(--accent); background:#eef4e9; color:var(--accent); border-radius:6px; font-weight:700; font-size:0.82rem; cursor:pointer;">Use this Eh above</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===================== TAB 4: ORGANIC MATTER, CARBON & CEC ===================== -->
 <section id="organic">
 
 <h2>Soil Organic Matter, Carbon &amp; C:N Ratio</h2>
@@ -383,7 +513,7 @@
 
 </section>
 
-<!-- ===================== TAB 4: LIMITING FACTORS & INTERACTIONS ===================== -->
+<!-- ===================== TAB 5: LIMITING FACTORS & INTERACTIONS ===================== -->
 <section id="limiting">
 
 
@@ -436,7 +566,7 @@
 
 </section>
 
-<!-- ===================== TAB 5: DEFICIENCY THRESHOLDS & CHECKER ===================== -->
+<!-- ===================== TAB 6: DEFICIENCY THRESHOLDS & CHECKER ===================== -->
 <section id="thresholds">
   <h2>Deficiency Thresholds &amp; Checker</h2>
 
@@ -495,7 +625,7 @@
 
 </section>
 
-<!-- ===================== TAB 6: CROP-SPECIFIC PROFILES ===================== -->
+<!-- ===================== TAB 7: CROP-SPECIFIC PROFILES ===================== -->
 <section id="cropneeds">
 
 
@@ -528,7 +658,7 @@
 
 </section>
 
-<!-- ===================== TAB 7: LAB REPORT ANALYZER & RECOMMENDATIONS ===================== -->
+<!-- ===================== TAB 8: LAB REPORT ANALYZER & RECOMMENDATIONS ===================== -->
 <section id="labreport">
 
 
@@ -574,6 +704,17 @@
 </main>
 
 <footer>Educational tool — approximate, illustrative curves based on standard soil-science references (not a substitute for a site-specific soil test).</footer>
+
+<div id="learnModal" class="learn-panel" role="complementary" aria-labelledby="learnTitle">
+  <div class="learn-head">
+    <h2 id="learnTitle">Learn</h2>
+    <span id="learnMeta" class="learn-meta"></span>
+    <button id="learnMin" class="learn-iconbtn" aria-label="Minimize quiz" title="Minimize quiz">▁</button>
+    <button id="learnClose" class="learn-iconbtn" aria-label="Close quiz" title="Close quiz">✕</button>
+  </div>
+  <div id="learnBody" class="learn-body"></div>
+</div>
+<button id="learnBack" class="learn-back">↩ Back to quiz</button>
 
 <div id="chartLightbox" style="display:none; position:fixed; inset:0; background:rgba(20,20,15,0.92); z-index:1000; align-items:center; justify-content:center; padding:24px; flex-direction:column;">
   <button id="closeChartFullBtn" style="align-self:flex-end; margin:0 0 10px 0; padding:8px 16px; background:#f4f1e6; border:none; border-radius:6px; font-weight:700; cursor:pointer; color:#2b2a25;">✕ Close</button>
@@ -1336,6 +1477,7 @@ function applyCrop(key){
   buildCropNeedsTable();
   updateCropNeedsDetail();
   if(typeof renderLabResults === 'function') renderLabResults();
+  if(typeof updateEh === 'function') updateEh();
 
   if(!crop){
     tag.textContent = 'General / all-crop defaults';
@@ -1365,6 +1507,447 @@ function applyCrop(key){
   updateLiebig();
 }
 document.getElementById('cropSelect').addEventListener('change', e=> applyCrop(e.target.value));
+
+
+// ---------- SOIL REDOX (Eh) ----------
+// Typical Eh7 thresholds (mV, pH 7) where each electron acceptor is used up.
+const EH_THRESHOLDS = [330, 220, 120, -150, -250];
+const EH_ZONES = [
+  {label:'Oxidized (aerobic)', color:'#4a90d9', text:'Free O₂ is present. Roots and aerobic microbes respire normally, nitrification runs, and Fe and Mn sit as insoluble oxides.'},
+  {label:'Hypoxic — O₂ depleted', color:'#57a0a8', text:'O₂ is largely gone but nitrate is still present. Root respiration is impaired; waterlogging stress begins for upland crops.'},
+  {label:'Nitrate- & Mn-reducing', color:'#c9a227', text:'Denitrification removes nitrate as N₂/N₂O gas and Mn oxides dissolve to soluble Mn²⁺.'},
+  {label:'Iron-reducing', color:'#a85c32', text:'Fe oxides dissolve to soluble Fe²⁺ and release the phosphate bound to them. Typical of flooded rice soils.'},
+  {label:'Sulfate-reducing', color:'#7a4fa3', text:'Sulfate becomes sulfide (H₂S). Toxic to roots, and it locks up Zn and Cu as insoluble sulfides.'},
+  {label:'Methanogenic', color:'#5a3a4a', text:'CO₂ is reduced to methane. The soil is strongly reduced, with high greenhouse gas emissions and severe stress for most plants.'}
+];
+const EH_LADDER_REACTIONS = ['O₂ → H₂O','NO₃⁻ → N₂, Mn⁴⁺ → Mn²⁺','Fe³⁺ → Fe²⁺','SO₄²⁻ → H₂S','CO₂ → CH₄'];
+
+const EH_NUTRIENT_ROWS = [
+  {name:'Nitrogen', thr:220, oxidized:'Nitrification active; NO₃⁻ is the main plant-available form.', transition:'Denitrification starting in wet microsites; first NO₃⁻ losses.', reduced:'NO₃⁻ lost as N₂/N₂O gas; NH₄⁺ accumulates because nitrification stops.'},
+  {name:'Manganese', thr:200, oxidized:'Mn⁴⁺ oxides; low solubility, deficiency possible at high pH.', transition:'Mn oxides about to dissolve.', reduced:'Soluble Mn²⁺; toxicity risk, especially at acid pH.'},
+  {name:'Iron', thr:120, oxidized:'Fe³⁺ oxides; low solubility, chlorosis risk at high pH.', transition:'Fe oxides starting to reduce.', reduced:'Soluble Fe²⁺ is abundant; toxicity possible in flooded rice and acid soils.'},
+  {name:'Phosphorus', thr:120, oxidized:'Largely bound to Fe³⁺ oxides.', transition:'Fe-bound P about to be released.', reduced:'P released as Fe oxides dissolve; availability rises.'},
+  {name:'Sulfur', thr:-150, oxidized:'SO₄²⁻, the plant-available form.', transition:'Sulfate reduction approaching.', reduced:'SO₄²⁻ becomes H₂S/S²⁻; sulfide is toxic to roots and sulfur is no longer available as sulfate.'},
+  {name:'Zinc & copper', thr:-150, oxidized:'Solubility controlled mainly by pH.', transition:'Sulfide formation approaching.', reduced:'Precipitated as ZnS/CuS; deficiency risk.'},
+  {name:'Carbon', thr:-250, oxidized:'Decomposition releases CO₂.', transition:'Methane production approaching.', reduced:'CO₂ reduced to CH₄; methane emissions.'}
+];
+
+function ehState(eh7, thr){
+  if(eh7 < thr) return 'reduced';
+  if(eh7 < thr + 70) return 'transition';
+  return 'oxidized';
+}
+function ehFmt(v){ return (v>=0?'+':'−') + Math.abs(Math.round(v)); }
+
+function updateEh(){
+  const sl = document.getElementById('ehSlider');
+  if(!sl) return;
+  const eh = parseFloat(sl.value);
+  const ph = parseFloat(document.getElementById('ehPhSlider').value);
+  document.getElementById('ehLabel').textContent = ehFmt(eh) + ' mV';
+  document.getElementById('ehPhLabel').textContent = ph.toFixed(1);
+
+  const eh7 = eh + 59*(ph - 7);
+  const pe = eh / 59.16;
+  document.getElementById('eh7Out').textContent = ehFmt(eh7);
+  document.getElementById('peOut').textContent = pe.toFixed(1);
+
+  const zoneIdx = EH_THRESHOLDS.filter(t => eh7 < t).length;
+  const z = EH_ZONES[zoneIdx];
+  const box = document.getElementById('ehZoneBox');
+  box.style.borderLeftColor = z.color;
+  box.innerHTML = `<strong>${z.label}.</strong> ${z.text}`;
+
+  // ladder (thresholds shift with pH)
+  const svg = document.getElementById('ehLadderSvg');
+  const EHMAX = 800, EHMIN = -450, top = 16, bottom = 430, x0 = 80, x1 = 560;
+  const y = v => top + (EHMAX - v)/(EHMAX - EHMIN)*(bottom - top);
+  const thr = EH_THRESHOLDS.map(t => t - 59*(ph - 7));
+  const bounds = [EHMAX].concat(thr).concat([EHMIN]);
+  let s = '';
+  for(let i=0;i<EH_ZONES.length;i++){
+    const hi = bounds[i], lo = bounds[i+1];
+    const yt = y(hi), yb = y(lo);
+    s += `<rect x="${x0}" y="${yt}" width="${x1-x0}" height="${yb-yt}" fill="${EH_ZONES[i].color}" fill-opacity="${i===zoneIdx?0.38:0.16}"/>`;
+    s += `<text x="${x0+10}" y="${(yt+yb)/2+4}" font-size="12" font-weight="${i===zoneIdx?700:600}" fill="#2b2a25">${EH_ZONES[i].label}</text>`;
+  }
+  for(let v=-400; v<=800; v+=200){
+    s += `<line x1="${x0-5}" y1="${y(v)}" x2="${x0}" y2="${y(v)}" stroke="#6b6a5f"/>`;
+    s += `<text x="${x0-9}" y="${y(v)+4}" font-size="11" fill="#6b6a5f" text-anchor="end">${v}</text>`;
+  }
+  s += `<line x1="${x0}" y1="${top}" x2="${x0}" y2="${bottom}" stroke="#6b6a5f"/>`;
+  s += `<text x="16" y="${(top+bottom)/2}" font-size="11" fill="#6b6a5f" text-anchor="middle" transform="rotate(-90 16 ${(top+bottom)/2})">Eh (mV)</text>`;
+  thr.forEach((t,i)=>{
+    s += `<line x1="${x0}" y1="${y(t)}" x2="${x1}" y2="${y(t)}" stroke="#6b6a5f" stroke-width="1" stroke-dasharray="3,3"/>`;
+    s += `<text x="${x1+8}" y="${y(t)+4}" font-size="11" fill="#2b2a25">${ehFmt(t)} mV: ${EH_LADDER_REACTIONS[i]}</text>`;
+  });
+  const ye = y(Math.max(EHMIN, Math.min(EHMAX, eh)));
+  s += `<line x1="${x0}" y1="${ye}" x2="${x1}" y2="${ye}" stroke="#b3462c" stroke-width="2.5"/>`;
+  s += `<polygon points="${x0},${ye} ${x0-9},${ye-6} ${x0-9},${ye+6}" fill="#b3462c"/>`;
+  const lblY = ye < top + 22 ? ye + 16 : ye - 6;
+  s += `<text x="${x1-8}" y="${lblY}" font-size="12" font-weight="700" fill="#b3462c" text-anchor="end">Eh ${ehFmt(eh)} mV at pH ${ph.toFixed(1)}</text>`;
+  svg.innerHTML = s;
+
+  // nutrient table
+  const stateStyle = {oxidized:'#3d6b46', transition:'#c9a227', reduced:'#a85c32'};
+  const stateName = {oxidized:'Oxidized form', transition:'Transitioning', reduced:'Reduced form'};
+  let rows = '<tr><th>Element</th><th>Switches at Eh₇ below</th><th>Status</th><th>What it means for plants</th></tr>';
+  EH_NUTRIENT_ROWS.forEach(r=>{
+    const st = ehState(eh7, r.thr);
+    rows += `<tr><td>${r.name}</td><td>${ehFmt(r.thr)} mV</td><td style="color:${stateStyle[st]}; font-weight:700;">${stateName[st]}</td><td>${r[st]}</td></tr>`;
+  });
+  document.getElementById('ehNutrientTable').innerHTML = rows;
+
+  // crop note
+  const note = document.getElementById('cropEhNote');
+  const crop = (typeof cropData !== 'undefined') ? cropData[currentCropKey] : null;
+  if(!crop){ note.style.display = 'none'; }
+  else {
+    note.style.display = 'block';
+    note.innerHTML = (currentCropKey === 'rice')
+      ? `<strong>${crop.name}:</strong> flooded paddy soil normally falls to roughly −200 to +100 mV. Watch for Fe²⁺ toxicity and H₂S below about −150 mV, and for Zn deficiency in long-flooded soils.`
+      : `<strong>${crop.name}:</strong> upland roots need an aerated root zone, generally Eh above about +300 mV. Sustained readings below roughly +200 mV signal waterlogging stress and nitrate loss, so check irrigation scheduling and drainage.`;
+  }
+}
+
+function updateEhConversion(){
+  const ref = parseFloat(document.getElementById('ehRefSelect').value);
+  const raw = document.getElementById('ehReadingInput').value;
+  const out = document.getElementById('ehConvOut');
+  out.textContent = raw === '' ? '—' : ehFmt(parseFloat(raw) + ref);
+}
+
+document.getElementById('ehSlider').addEventListener('input', ()=>{
+  document.getElementById('ehPreset').value = 'custom';
+  updateEh();
+});
+document.getElementById('ehPhSlider').addEventListener('input', updateEh);
+document.getElementById('ehPreset').addEventListener('change', e=>{
+  if(e.target.value !== 'custom'){
+    document.getElementById('ehSlider').value = e.target.value;
+    updateEh();
+  }
+});
+document.getElementById('ehRefSelect').addEventListener('change', updateEhConversion);
+document.getElementById('ehReadingInput').addEventListener('input', updateEhConversion);
+document.getElementById('ehUseBtn').addEventListener('click', ()=>{
+  const raw = document.getElementById('ehReadingInput').value;
+  if(raw === '') return;
+  const v = parseFloat(raw) + parseFloat(document.getElementById('ehRefSelect').value);
+  document.getElementById('ehSlider').value = Math.max(-350, Math.min(750, v));
+  document.getElementById('ehPreset').value = 'custom';
+  updateEh();
+});
+updateEh();
+updateEhConversion();
+
+
+// ---------- LEARN: INTERACTIVE QUIZ ----------
+const LEARN_TOPICS = {
+  roles:'Nutrient roles & deficiency symptoms',
+  ph:'Soil pH & availability',
+  redox:'Soil redox (Eh)',
+  organic:'Organic matter, CEC & C:N',
+  limiting:'Limiting factors & interactions',
+  diagnose:'Diagnosis, lab reports & crops'
+};
+function lnGoTab(id){ const b = document.querySelector('.tab-btn[data-tab="'+id+'"]'); if(b) b.click(); }
+function lnSet(id, val, evt){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.value = val;
+  el.dispatchEvent(new Event(evt || 'input', {bubbles:true}));
+}
+function lnClickMobility(key){
+  const b = [...document.querySelectorAll('#mobilityButtons button')].find(x=>x.textContent.trim()===key);
+  if(b) b.click();
+}
+
+const LEARN_BANK = [
+  // ----- roles -----
+  {topic:'roles', q:'Which group of nutrients shows deficiency symptoms first on the OLDER, lower leaves?',
+   options:['N, P, K and Mg','Ca, S, Fe and Mn','Fe, Zn, Cu and B','Ca, B, Cu and Zn'], answer:0,
+   why:'These are mobile nutrients: the plant moves them out of old tissue to new growth when supply runs short. Ca, Fe, Mn, Zn, Cu and B are immobile, so their symptoms appear in new growth.',
+   tryLabel:'Open the mobility diagram (N)', run:()=>{ lnGoTab('roles'); lnClickMobility('N'); }},
+  {topic:'roles', q:'Yellowing between the veins of the NEWEST leaves, with the veins staying green, most often points to deficiency of which nutrient?',
+   options:['Nitrogen','Iron','Potassium','Phosphorus'], answer:1,
+   why:'Iron is immobile, so deficiency shows in new leaves as interveinal chlorosis. N and P are mobile and show first on older leaves.',
+   tryLabel:'Open the mobility diagram (Fe)', run:()=>{ lnGoTab('roles'); lnClickMobility('Fe'); }},
+  {topic:'roles', q:'Blossom-end rot in tomato fruit is a symptom of which nutrient problem?',
+   options:['Potassium','Nitrogen','Calcium','Boron'], answer:2,
+   why:'Calcium is immobile and moves with the transpiration stream, so fruit can be short of it even when soil Ca is adequate, often because of uneven water supply.',
+   tryLabel:'Select tomato and view its deficiency note', run:()=>{ lnSet('cropSelect','tomato','change'); lnGoTab('roles'); }},
+  // ----- pH -----
+  {topic:'ph', q:'Which soil pH range gives the broadest nutrient availability window for most crops?',
+   options:['4.0 to 5.0','6.0 to 7.5','8.0 to 9.0','5.0 to 5.5'], answer:1,
+   why:'Between about pH 6.0 and 7.5 most macro- and micronutrients are soluble at the same time. Below that Al and Mn turn toxic; above it Fe, Mn, Zn and Cu lock up.',
+   tryLabel:'Set the pH slider to 6.8', run:()=>{ lnGoTab('ph'); lnSet('phSlider',6.8); }},
+  {topic:'ph', q:'At pH 8.5, which micronutrients become scarce?',
+   options:['Mo only','N and S','Fe, Mn, Zn and Cu','K and Ca'], answer:2,
+   why:'In alkaline soil Fe, Mn, Zn and Cu precipitate as insoluble hydroxides and carbonates, causing lime-induced chlorosis.',
+   tryLabel:'Set the pH slider to 8.5', run:()=>{ lnGoTab('ph'); lnSet('phSlider',8.5); }},
+  {topic:'ph', q:'Which nutrient becomes MORE available as pH rises into the alkaline range?',
+   options:['Molybdenum','Iron','Manganese','Zinc'], answer:0,
+   why:'Molybdenum is the exception: its availability increases with pH, which is why Mo deficiency is usually fixed by liming rather than by adding Mo.',
+   tryLabel:'Set the pH slider to 9', run:()=>{ lnGoTab('ph'); lnSet('phSlider',9); }},
+  {topic:'ph', q:'Blueberry prefers pH 4.5 to 5.5. Which problem dominates if the soil pH climbs above about 5.5 to 6.0?',
+   options:['Aluminum toxicity','Iron chlorosis','Nitrogen excess','Calcium toxicity'], answer:1,
+   why:'Blueberry is adapted to acid soil. At higher pH iron becomes unavailable and chlorosis appears, a clear case of why optimum pH is crop-specific.',
+   tryLabel:'Select blueberry and view its pH band', run:()=>{ lnSet('cropSelect','blueberry','change'); lnGoTab('ph'); }},
+  {topic:'ph', q:'Roots that absorb ammonium (NH₄⁺) release H⁺ to balance charge. What happens to the rhizosphere pH?',
+   options:['It rises','It falls (acidifies)','It stays the same','It rises, then falls'], answer:1,
+   why:'Taking up a cation and releasing H⁺ acidifies the root zone. Nitrate uptake does the opposite and alkalinizes it.',
+   tryLabel:'Open the pH tab', run:()=>{ lnGoTab('ph'); }},
+  // ----- redox -----
+  {topic:'redox', q:'As a soil floods, which electron acceptor is used up first?',
+   options:['Sulfate','Iron (Fe³⁺)','Nitrate','Oxygen'], answer:3,
+   why:'Microbes use the most energy-yielding acceptor first, so the order is O₂, then nitrate and Mn, then Fe, then sulfate, then CO₂.',
+   tryLabel:'Show a soil where O₂ is running out (+280 mV)', run:()=>{ lnGoTab('redox'); lnSet('ehPreset','280','change'); }},
+  {topic:'redox', q:'At pH 7, Fe³⁺ oxides begin to be reduced to soluble Fe²⁺ below an Eh of about…',
+   options:['+330 mV','+120 mV','−150 mV','−250 mV'], answer:1,
+   why:'+330 mV is where O₂ disappears, −150 mV is sulfate reduction and −250 mV is methane formation. Fe reduction sits near +120 mV.',
+   tryLabel:'Set Eh to +100 mV at pH 7', run:()=>{ lnGoTab('redox'); lnSet('ehPhSlider',7); lnSet('ehSlider',100); }},
+  {topic:'redox', q:'Two soils both read Eh = +300 mV, one at pH 5 and one at pH 8. Which is more strongly reduced?',
+   options:['The pH 8 soil','The pH 5 soil','They are the same','It depends only on temperature'], answer:1,
+   why:'Eh falls about 59 mV per pH unit, so compare at pH 7: Eh₇ = Eh + 59 × (pH − 7). That gives +182 mV for the pH 5 soil and +359 mV for the pH 8 soil.',
+   tryLabel:'Set Eh +300 mV at pH 5, then slide pH to 8', run:()=>{ lnGoTab('redox'); lnSet('ehSlider',300); lnSet('ehPhSlider',5); }},
+  {topic:'redox', q:'What usually happens to plant-available phosphorus when a soil floods and Fe oxides are reduced?',
+   options:['It decreases','It increases as Fe-bound P is released','It is unchanged','It escapes as a gas'], answer:1,
+   why:'Much soil P is bound to Fe³⁺ oxides. When those dissolve as Fe²⁺, the P is released, which is one reason flooded rice soils often show higher P availability.',
+   tryLabel:'Show a flooded paddy soil (−100 mV)', run:()=>{ lnGoTab('redox'); lnSet('ehPreset','-100','change'); }},
+  {topic:'redox', q:'A platinum electrode reads +150 mV against an Ag/AgCl (saturated KCl) reference. What is the soil Eh?',
+   options:['−49 mV','+150 mV','+349 mV','+394 mV'], answer:2,
+   why:'Eh = reading + reference potential. For Ag/AgCl in saturated KCl the reference is +199 mV, so 150 + 199 = +349 mV. (+394 mV would be with a calomel reference.)',
+   tryLabel:'Open the electrode converter', run:()=>{ lnGoTab('redox'); lnSet('ehRefSelect','199','change'); lnSet('ehReadingInput',150); }},
+  // ----- organic -----
+  {topic:'organic', q:'A lab reports 2.0% organic carbon. Using the van Bemmelen factor of 1.724, soil organic matter is about…',
+   options:['1.2%','2.0%','3.4%','5.2%'], answer:2,
+   why:'SOM is assumed to be about 58% carbon, so SOM = OC × 1.724 = 2.0 × 1.724 ≈ 3.4%.',
+   tryLabel:'Set OC to 2.0%', run:()=>{ lnGoTab('organic'); lnSet('ocSlider',2.0); lnSet('factorSlider',1.724); }},
+  {topic:'organic', q:'In the CEC calculator, 25% clay and 2.5% organic matter give an estimated CEC of…',
+   options:['5.0 cmol(+)/kg','17.5 cmol(+)/kg','22.5 cmol(+)/kg','62.5 cmol(+)/kg'], answer:2,
+   why:'The tool estimates CEC = 0.7 × clay% + 2.0 × SOM% = 17.5 + 5.0 = 22.5 cmol(+)/kg. Organic matter contributes far more CEC per percent than clay.',
+   tryLabel:'Set clay 25% and SOM 2.5%', run:()=>{ lnGoTab('organic'); lnSet('claySlider',25); lnSet('somCecSlider',2.5); }},
+  {topic:'organic', q:'In the base saturation calculator, what happens to the share of CEC held by H⁺/Al³⁺ as pH falls from 7 to 5?',
+   options:['It falls','It stays about the same','It rises sharply','It only changes if CEC changes'], answer:2,
+   why:'Base saturation drops as soil acidifies, so Ca, Mg and K are replaced on exchange sites by H⁺ and Al³⁺. In the tool, acidity goes from about 12% to about 68% of CEC.',
+   tryLabel:'Set the base saturation pH to 5.0', run:()=>{ lnGoTab('organic'); lnSet('cecPhSlider',5.0); }},
+  {topic:'organic', q:'Wheat straw has a C:N ratio near 60:1. Incorporated fresh with no extra nitrogen, it most likely…',
+   options:['Releases a flush of mineral N','Temporarily ties up soil mineral N','Has no effect on N','Raises soil pH by two units'], answer:1,
+   why:'Microbes need about 24 parts C per part N. With far more carbon than that, they take mineral N from the soil (immobilization) until the residue breaks down.',
+   tryLabel:'Show a 100% wheat straw blend', run:()=>{ lnGoTab('organic'); lnSet('matB_share',100); lnSet('matA_share',0); }},
+  {topic:'organic', q:'The C:N calculator\'s default is a 50:50 mass mix of cattle manure (15:1) and wheat straw (60:1). The blended ratio is closest to…',
+   options:['12:1','24:1','37:1','75:1'], answer:1,
+   why:'The tool assumes similar carbon per kg, so blended C:N = 1 ÷ (0.5/15 + 0.5/60) = 24:1. It is not the simple average (37.5) because the N-rich manure supplies most of the nitrogen.',
+   tryLabel:'Reset to the 50:50 blend', run:()=>{ lnGoTab('organic'); lnSet('matA_share',50); lnSet('matB_share',50); }},
+  // ----- limiting -----
+  {topic:'limiting', q:'Supply as a share of crop demand is N 80%, P 55%, K 90%, S 75%, Ca 85%, Mg 70%. What limits yield under Liebig\'s law?',
+   options:['Nitrogen','Phosphorus (55%)','The average of all six (76%)','Potassium'], answer:1,
+   why:'Yield is capped by the scarcest nutrient relative to demand, not by the average. Adding more of any other nutrient will not raise yield until P is corrected.',
+   tryLabel:'Load these values into the barrel', run:()=>{ lnGoTab('limiting'); lnSet('liebigSlider_N',80); lnSet('liebigSlider_P',55); lnSet('liebigSlider_K',90); lnSet('liebigSlider_S',75); lnSet('liebigSlider_Ca',85); lnSet('liebigSlider_Mg',70); }},
+  {topic:'limiting', q:'Heavy potassium fertilization most commonly induces a deficiency of which nutrients?',
+   options:['N and S','Fe and Zn','Mg (and Ca)','Mo and B'], answer:2,
+   why:'K⁺, Mg²⁺ and Ca²⁺ compete for the same root uptake sites and exchange sites, so excess K can suppress Mg and Ca uptake.',
+   tryLabel:'Open the interaction for excess K', run:()=>{ lnGoTab('limiting'); lnSet('interactSelect','K','change'); }},
+  // ----- diagnose -----
+  {topic:'diagnose', q:'In the threshold reference table, Olsen soil phosphorus below about what value is considered deficient?',
+   options:['3 ppm','8 ppm','20 ppm','40 ppm'], answer:1,
+   why:'The reference shows deficiency below about 8 ppm Olsen-P, with 15 to 30 ppm sufficient. Always use your own lab\'s calibrated ranges for decisions.',
+   tryLabel:'Open the threshold table', run:()=>{ lnGoTab('thresholds'); }},
+  {topic:'diagnose', q:'A leaf tissue test shows 1.8% nitrogen. How does the Lab Report tab classify it?',
+   options:['Deficient','Low / marginal','Sufficient','High'], answer:0,
+   why:'Tissue N below 2.0% is deficient, 2.0 to 2.5% is marginal and 2.5 to 4.0% is sufficient.',
+   tryLabel:'Enter 1.8% N as a tissue sample', run:()=>{ lnGoTab('labreport'); lnSet('labTestType','tissue','change'); lnSet('lab_N',1.8); }},
+  {topic:'diagnose', q:'Soil pH is 5.0 and the selected crop is alfalfa (optimal pH 6.5 to 7.5). What pH correction does the Lab Report suggest?',
+   options:['Agricultural lime to raise pH','Elemental sulfur to lower pH','No correction','Gypsum only'], answer:0,
+   why:'The soil is more acidic than alfalfa tolerates, so liming is suggested. It also improves Ca, Mg, P and N availability and reduces Al toxicity risk.',
+   tryLabel:'Select alfalfa and enter pH 5.0', run:()=>{ lnSet('cropSelect','alfalfa','change'); lnGoTab('labreport'); lnSet('labPh',5.0); }},
+  {topic:'diagnose', q:'Which crop in the Crop-Specific Profiles table has the largest total K₂O uptake?',
+   options:['Tomato','Potato','Alfalfa','Corn'], answer:2,
+   why:'Alfalfa removes around 450 kg K₂O/ha across its cuttings, more than tomato (about 350) or potato (about 280). That is why K replenishment between cuttings is critical.',
+   tryLabel:'Open the crop table with alfalfa selected', run:()=>{ lnSet('cropSelect','alfalfa','change'); lnGoTab('cropneeds'); }}
+];
+
+(function assignLearnTabs(){
+  const byTopic = {roles:'roles', ph:'ph', redox:'redox', organic:'organic', limiting:'limiting'};
+  const special = [
+    ['In the threshold reference','thresholds'], ['A leaf tissue test','labreport'],
+    ['Soil pH is 5.0 and','labreport'], ['Which crop in','cropneeds']
+  ];
+  LEARN_BANK.forEach(q => {
+    q.tab = byTopic[q.topic];
+    special.forEach(s => { if(q.q.startsWith(s[0])) q.tab = s[1]; });
+  });
+})();
+function lnTabName(id){
+  const b = document.querySelector('.tab-btn[data-tab="'+id+'"]');
+  return b ? b.textContent.replace(/^\s*\d+\.\s*/,'').trim() : id;
+}
+
+const learnState = {screen:'start', pool:[], idx:0, score:0, answered:false, picked:null, byTopic:{}, missed:[]};
+
+function lnShuffle(a){
+  const r = a.slice();
+  for(let i=r.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [r[i],r[j]] = [r[j],r[i]]; }
+  return r;
+}
+function lnSetBody(open, min){
+  document.body.classList.toggle('learn-open', open);
+  document.body.classList.toggle('learn-min', open && min);
+}
+function lnOpen(){
+  const m = document.getElementById('learnModal');
+  m.classList.add('open');
+  document.getElementById('learnBack').style.display = 'none';
+  lnSetBody(true, m.classList.contains('min'));
+  renderLearn();
+}
+function lnClose(){
+  const m = document.getElementById('learnModal');
+  m.classList.remove('open');
+  m.classList.remove('min');
+  lnSetBody(false, false);
+  document.getElementById('learnMin').textContent = '▁';
+  document.getElementById('learnBack').style.display = (learnState.screen === 'start') ? 'none' : 'block';
+}
+function lnToggleMin(){
+  const m = document.getElementById('learnModal');
+  const min = m.classList.toggle('min');
+  lnSetBody(true, min);
+  const b = document.getElementById('learnMin');
+  b.textContent = min ? '▢' : '▁';
+  b.title = min ? 'Expand quiz' : 'Minimize quiz';
+}
+function lnTryIt(q){
+  // quiz stays open beside the tool: just set the tool up
+  try { q.run(); } catch(e) { console.error(e); }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function lnStart(){
+  const topic = document.getElementById('learnTopic').value;
+  const lenVal = document.getElementById('learnLen').value;
+  let pool = LEARN_BANK.filter(q => topic === 'all' || q.topic === topic);
+  pool = lnShuffle(pool);
+  if(lenVal !== 'all') pool = pool.slice(0, parseInt(lenVal,10));
+  learnState.pool = pool.map(q => Object.assign({}, q, {order: lnShuffle(q.options.map((_,i)=>i))}));
+  learnState.idx = 0; learnState.score = 0; learnState.answered = false; learnState.picked = null;
+  learnState.byTopic = {}; learnState.missed = []; learnState.screen = 'q';
+  renderLearn();
+}
+function lnAnswer(pos){
+  if(learnState.answered) return;
+  const q = learnState.pool[learnState.idx];
+  const chosenOriginal = q.order[pos];
+  const ok = chosenOriginal === q.answer;
+  learnState.answered = true; learnState.picked = pos;
+  const t = learnState.byTopic[q.topic] || (learnState.byTopic[q.topic] = {c:0, t:0});
+  t.t++;
+  if(ok){ learnState.score++; t.c++; } else { learnState.missed.push(q); }
+  renderLearn();
+}
+function lnNext(){
+  learnState.idx++;
+  learnState.answered = false; learnState.picked = null;
+  if(learnState.idx >= learnState.pool.length) learnState.screen = 'done';
+  renderLearn();
+}
+function renderLearn(){
+  const body = document.getElementById('learnBody');
+  document.getElementById('learnMeta').textContent =
+    learnState.screen === 'q' ? `Question ${learnState.idx+1} of ${learnState.pool.length} · ${learnState.score} correct` :
+    learnState.screen === 'done' ? `Finished · ${learnState.score} / ${learnState.pool.length}` : '';
+  if(learnState.screen === 'start'){
+    const counts = {};
+    LEARN_BANK.forEach(q => counts[q.topic] = (counts[q.topic]||0)+1);
+    let topicOpts = `<option value="all">All topics (${LEARN_BANK.length} questions)</option>`;
+    Object.keys(LEARN_TOPICS).forEach(k => topicOpts += `<option value="${k}">${LEARN_TOPICS[k]} (${counts[k]||0})</option>`);
+    body.innerHTML = `
+      <p>The quiz stays open beside the tool, so you can use the tool to work out each answer. After you answer, one button sets the tool up to show the result.</p>
+      <div class="row">
+        <div class="col"><label>Topic</label><select id="learnTopic">${topicOpts}</select></div>
+        <div class="col"><label>Number of questions</label>
+          <select id="learnLen"><option value="5">5</option><option value="10" selected>10</option><option value="all">All in topic</option></select></div>
+      </div>
+      <div class="learn-actions"><button class="learn-primary" id="learnStartBtn">Start quiz</button></div>`;
+    document.getElementById('learnStartBtn').addEventListener('click', lnStart);
+    return;
+  }
+  if(learnState.screen === 'done'){
+    const total = learnState.pool.length, sc = learnState.score;
+    const pct = Math.round(sc/total*100);
+    const msg = pct >= 80 ? 'Excellent work.' : pct >= 50 ? 'Good progress. Review the missed questions below.' : 'Keep exploring. Use the Try it buttons below to see each answer in the tool.';
+    let topics = '';
+    Object.keys(learnState.byTopic).forEach(k => {
+      const t = learnState.byTopic[k];
+      topics += `<tr><td>${LEARN_TOPICS[k]}</td><td>${t.c} / ${t.t}</td></tr>`;
+    });
+    let missed = '';
+    learnState.missed.forEach((q,i) => {
+      missed += `<div class="learn-missed"><strong>${q.q}</strong><br>Correct answer: ${q.options[q.answer]}<br><span class="muted">${q.why}</span><br>
+        <button class="learn-secondary" style="margin-top:6px;" data-missed="${i}">${q.tryLabel}</button></div>`;
+    });
+    body.innerHTML = `
+      <div class="result-box"><div><div class="small-cap">Score</div><div class="big-num">${sc} / ${total}</div></div><div><div class="small-cap">Percent</div><div class="big-num">${pct}%</div></div></div>
+      <p>${msg}</p>
+      <table><tr><th>Topic</th><th>Correct</th></tr>${topics}</table>
+      ${learnState.missed.length ? '<h3 style="margin-top:18px;">Review what you missed</h3>' + missed : ''}
+      <div class="learn-actions"><button class="learn-primary" id="learnAgainBtn">New quiz</button><button class="learn-secondary" id="learnDoneClose">Close</button></div>`;
+    body.querySelectorAll('[data-missed]').forEach(b => b.addEventListener('click', () => lnTryIt(learnState.missed[parseInt(b.dataset.missed,10)])));
+    document.getElementById('learnAgainBtn').addEventListener('click', () => { learnState.screen = 'start'; renderLearn(); });
+    document.getElementById('learnDoneClose').addEventListener('click', lnClose);
+    return;
+  }
+  // question screen
+  const q = learnState.pool[learnState.idx];
+  const total = learnState.pool.length;
+  const progress = (learnState.idx + (learnState.answered ? 1 : 0)) / total * 100;
+  let opts = '';
+  q.order.forEach((orig,pos) => {
+    let cls = 'learn-opt';
+    if(learnState.answered){
+      if(orig === q.answer) cls += ' correct';
+      else if(pos === learnState.picked) cls += ' wrong';
+    }
+    opts += `<button class="${cls}" data-pos="${pos}" ${learnState.answered ? 'disabled' : ''}>${q.options[orig]}</button>`;
+  });
+  const hint = learnState.answered ? '' :
+    `<div class="learn-actions" style="margin:0 0 6px;"><button class="learn-secondary" id="learnHintBtn">Open the “${lnTabName(q.tab)}” tab</button></div>
+     <p class="muted" style="margin:0 0 12px;">Use the tool to work out the answer, then choose an option.</p>`;
+  let feedback = '';
+  if(learnState.answered){
+    const ok = q.order[learnState.picked] === q.answer;
+    const last = learnState.idx === total - 1;
+    feedback = `
+      <div class="callout ${ok ? '' : 'warn'}"><strong>${ok ? 'Correct.' : 'Not quite.'}</strong> ${q.why}</div>
+      <div class="learn-actions">
+        <button class="learn-secondary" id="learnTryBtn">${q.tryLabel}</button>
+        <button class="learn-primary" id="learnNextBtn">${last ? 'See results' : 'Next question'}</button>
+      </div>`;
+  }
+  body.innerHTML = `
+    <div class="flex-between"><span class="learn-tag">${LEARN_TOPICS[q.topic]}</span></div>
+    <div class="learn-progress"><div style="width:${progress}%"></div></div>
+    <div class="learn-q">${q.q}</div>
+    ${hint}
+    ${opts}
+    ${feedback}`;
+  body.querySelectorAll('.learn-opt').forEach(b => b.addEventListener('click', () => lnAnswer(parseInt(b.dataset.pos,10))));
+  if(learnState.answered){
+    document.getElementById('learnTryBtn').addEventListener('click', () => lnTryIt(q));
+    document.getElementById('learnNextBtn').addEventListener('click', lnNext);
+  } else {
+    document.getElementById('learnHintBtn').addEventListener('click', () => { lnGoTab(q.tab); window.scrollTo({top:0, behavior:'smooth'}); });
+  }
+}
+document.getElementById('learnBtn').addEventListener('click', () => {
+  const m = document.getElementById('learnModal');
+  if(!m.classList.contains('open')) lnOpen();
+  else if(m.classList.contains('min')) lnToggleMin();
+  else lnClose();
+});
+document.getElementById('learnBack').addEventListener('click', lnOpen);
+document.getElementById('learnClose').addEventListener('click', lnClose);
+document.getElementById('learnMin').addEventListener('click', lnToggleMin);
 
 // ---------- FULL-PAGE CHART LIGHTBOX ----------
 document.getElementById('openChartFullBtn').addEventListener('click', ()=>{
